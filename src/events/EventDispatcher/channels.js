@@ -2,7 +2,7 @@
  of the subscribers and refrence to 
  their objects
  */
-import  {Event_1_TextArea, Event_2_Geez, Event_3_Misspelled, Event_4_Suggestion, Event_5_Interact} from './event.js';
+import  {Event_1_TextArea, Event_2_Geez, Event_3_Misspelled, Event_4_Suggestion, Event_5_Interact} from '../event/event.js';
 class channel{
     constructor(channelName, eventName){
         this.channelName = channelName;
