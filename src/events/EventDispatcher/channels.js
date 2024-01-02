@@ -2,7 +2,7 @@
  of the subscribers and refrence to 
  their objects
  */
-import  {Event_1_TextArea, Event_2_Geez, Event_3_Misspelled, Event_4_Suggestion, Event_5_Interact} from '../event/event.js';
+import { Event_1_TextArea, Event_2_Geez, Event_3_Misspelled, Event_4_Suggestion, Event_5_Interact } from '../event/event.js';
 class channel{
     constructor(channelName, eventName){
         this.channelName = channelName;
@@ -26,5 +26,4 @@ listChannels.add(channel_3_Misspelled);
 listChannels.add(channel_4_Suggestion);
 listChannels.add(channel_5_Interact);
 // export {listChannels, channel_1_TextArea, channel_2_Geez, channel_3_Misspelled, channel_4_Suggestion, channel_5_Interact};
-export {listChannels};
-export default channel;
+export   {listChannels};
