@@ -15,6 +15,7 @@ class eventDispatcher{
         if (this.channels[channelName]){
             this.channels[channelName].subscribers.foreach(function(subscriber){
                 subscriber.handleEvent(Event);
+                // the handleEvent function should be implemented in the subscriber class
             })
         }
         else{

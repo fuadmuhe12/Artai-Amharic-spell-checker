@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Spell Checker Extension",
+  "version": "1.0.0",
+  "description": "Provides spell-checking functionality within web pages",
+  "action" : {
+    "default_popup": "./src/popup/pop.html"
+  },
+  "permissions": ["activeTab" ]
+}
