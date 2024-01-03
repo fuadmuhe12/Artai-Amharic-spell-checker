@@ -2,7 +2,22 @@
  of the subscribers and refrence to 
  their objects
  */
-import { Event_1_TextArea, Event_2_Geez, Event_3_Misspelled, Event_4_Suggestion, Event_5_Interact } from '../event/event.js';
+// ---------------------------------------------------------------------------------------------
+// class Event
+class Event{
+    constructor(eventName, data=null){
+        this.eventName = eventName;
+        this.data = data;
+    }
+}
+let Event_1_TextArea = new Event("TextAreaDetected");
+let Event_2_Geez  = new Event("GeezScriptDetected");
+let Event_3_Misspelled = new Event("MisspelledWordFound");
+let Event_4_Suggestion = new Event("SuggestionSelected");
+let Event_5_Interact = new Event("UserInteractedWithHighlightedWord");
+
+// ---------------------------------------------------------------------------------------------
+// channel`s class
 class channel{
     constructor(channelName, eventName){
         this.channelName = channelName;
@@ -25,5 +40,4 @@ listChannels.add(channel_2_Geez);
 listChannels.add(channel_3_Misspelled);
 listChannels.add(channel_4_Suggestion);
 listChannels.add(channel_5_Interact);
-// export {listChannels, channel_1_TextArea, channel_2_Geez, channel_3_Misspelled, channel_4_Suggestion, channel_5_Interact};
-export   {listChannels};
+// ---------------------------------------------------------------------------------------------

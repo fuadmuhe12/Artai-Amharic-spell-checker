@@ -1,3 +1,7 @@
+
+// logger class
+
+
 // Enum for log levels
 const LogLevel = {
     Info: 1,
