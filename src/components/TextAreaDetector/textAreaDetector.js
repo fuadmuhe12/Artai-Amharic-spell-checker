@@ -185,16 +185,31 @@ class UserInterfaceManager {
                 this.#spellcheckStatus = true;
                 // inject an image icon into the parent of text area
                 const parent = textArea1.parentElement;
+                const div = document.createElement('div');
+                div.setAttribute('id', 'spellcheck-div');
+                
                 const icon = document.createElement('img');
-                icon.setAttribute('src', chrome.runtime.getURL('./src/Icons/font.png'));
+                icon.setAttribute('src', 'https://cdn.icon-icons.com/icons2/2645/PNG/512/textarea_t_text_icon_159809.png');
                 icon.setAttribute('id', 'spellcheck-icon');
-                icon.setAttribute('title', 'Spellcheck');
+                icon.setAttribute('title', 'Artie Amharic Spellcheck');
                 icon.setAttribute('style', 'width: 20px; height: 20px; margin-left: 5px; cursor: pointer;');
-                parent.appendChild(icon);   
-                console.log(icon, "icon");
+                div.appendChild(icon);
+                icon.addEventListener('mouseover', function() {
+                    this.style.backgroundColor = 'lightgreen';
+                });
+                icon.addEventListener('mouseout', function() {
+                    this.style.backgroundColor = '';
+                });
+                
+                // icon_inner =  " <img src = 'https://cdn.icon-icons.com/icons2/2645/PNG/512/textarea_t_text_icon_159809.png' id='spellcheck-icon' title = 'Amharic Spellcheck'  /> "   
+                // div.innerHTML = icon_inner;
+                console.log(div, "div");
+                parent.appendChild(div);
                 console.log(parent, "parent");
 
                 break;
+            case "GeezScript":
+                //to be continued
             
         }
         console.log("event is ended");
@@ -212,7 +227,13 @@ class UserInterfaceManager {
 const userInterfaceManager = new UserInterfaceManager();
 
 userInterfaceManager.subscribeEvent("TextArea");
-//---------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//class for GeezScriptDetector
+
+class GeezScriptDetector {}
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------
 class TextAreaDetector {
     constructor() {
         this.textAreaList = [];
