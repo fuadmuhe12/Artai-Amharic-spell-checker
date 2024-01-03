@@ -55,10 +55,10 @@ class Logger {
 const logger  =  new Logger();
 window.logger = logger;
 console.log(logger);
-//-------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------
 
 // Class for text area detector in web page
-// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------
 // class Event
 class Event{
     constructor(eventName, data=null){
@@ -72,7 +72,7 @@ let Event_3_Misspelled = new Event("MisspelledWordFound");
 let Event_4_Suggestion = new Event("SuggestionSelected");
 let Event_5_Interact = new Event("UserInteractedWithHighlightedWord");
 
-// ---------------------------------------------------------------------------------------------
+// -------------------------------------------------------//---------------------------------------------------------------------------------------------------------------------------------------------------
 // channel`s class
 class channel{
     constructor(channelName, eventName){
@@ -97,9 +97,9 @@ listChannels.add(channel_3_Misspelled);
 listChannels.add(channel_4_Suggestion);
 listChannels.add(channel_5_Interact);
 console.log(listChannels);
-// ---------------------------------------------------------------------------------------------
+// ------------------------------------------------//----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------------------------------------------------- 
+//-------------------------------------------------//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
 //Evant Dispatcher class 
 class EventDispatcher {
     channels = listChannels;
@@ -114,6 +114,7 @@ class EventDispatcher {
                 channelFound = true;
                 break;
             }
+            
         }
 
         if (!channelFound) {
@@ -132,8 +133,12 @@ class EventDispatcher {
                     subscriber.handleEvent(event);
                     // the handleEvent function should be implemented in the subscriber class
                 });
+                if (element.subscribers.length === 0){
+                    logger.warn(`No subscribers for channel ${channelName}`);
+                }
                 break;
             }
+
         }
 
         if (!channelFound) {
@@ -149,7 +154,7 @@ class EventDispatcher {
 
 const EventDispatcherObj = new EventDispatcher();
 
-//---------------------------------------------------------------------------------------------------------------------
+//------------------------------//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // UserInterfaceManager class
 class UserInterfaceManager {
     #spellcheckStatus = false;
@@ -207,9 +212,16 @@ class UserInterfaceManager {
                 parent.appendChild(div);
                 console.log(parent, "parent");
 
+
                 break;
             case "GeezScript":
-                //to be continued
+                console.log("GeezScript event is started");
+                // if GeezScript is detected, activate the spellcheck to send the text to the server
+                this.#GeezScript = event.DOM;
+                this.#GeezScript = true;
+                console.log("GeezScript is detected and spellcheck is activated");
+
+                
             
         }
         console.log("event is ended");
@@ -227,13 +239,91 @@ class UserInterfaceManager {
 const userInterfaceManager = new UserInterfaceManager();
 
 userInterfaceManager.subscribeEvent("TextArea");
-//--------------------------------------------------------------------------------------------------------------------------------------------
+userInterfaceManager.subscribeEvent("GeezScript");
+//---------------------------------------------//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //class for GeezScriptDetector
 
-class GeezScriptDetector {}
+class GeezScriptDetector {
+    #isGeezScript = false;
+    #textAreaList = [];
+    #previousText = ""; // Store the previous text
+    eventDispatcher = EventDispatcherObj;
+
+    constructor() {
+        setInterval(() => {
+            // Check if the text area's value has changed
+            if (this.#textAreaList.length > 0 && this.#textAreaList[0].value !== this.#previousText) {
+                this.#previousText = this.#textAreaList[0].value;
+
+                this.#isGeezScript = this.isGeezScript(this.#previousText);
+                if (this.#isGeezScript) {
+                    logger.info("Amharic Geez script detected");
+                    this.publishEvent("GeezScript", { type: "GeezScript", DOM: this.#textAreaList[0] });
+                }
+            }
+        }, 3000); // Check every 3 seconds
+    }
+
+    isGeezScript(text) {
+        const totalCharacters = text.replace(/\s/g, "").length; // Exclude whitespace characters
+        let geezCharacters = 0;
+
+        // Iterate through each character in the text
+        for (let i = 0; i < text.length; i++) {
+            // Check if the character is in the Amharic Geez script range
+            if (/[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF]/.test(text[i])) {
+                geezCharacters++;
+            }
+        }
+
+        // Calculate the percentage of Amharic characters
+        const percentage = (geezCharacters / totalCharacters) * 100;
+
+        // Log the detection details
+        logger.info(`Total Characters: ${totalCharacters}, Geez Characters: ${geezCharacters}, Percentage: ${percentage}%`);
+
+        // Return true if 70% or more of the text is in Amharic script
+        return percentage >= 70;
+    }
+
+    subscribeEvent(channel) {
+        this.eventDispatcher.subscribe(channel, this);
+    }
+
+    publishEvent(channelName, payload) {
+        if (channelName === "GeezScript") {
+            this.eventDispatcher.publishEvent(channelName, payload);
+            logger.info(`Geez  published Event to channel ${channelName}`);
+        }
+        else {
+            logger.warn(`No channel with name ${channelName}`);
+        }
+
+       
+    }
+
+    handleEvent(event) {
+        switch (event.type) {
+            case "textArea":
+                this.#textAreaList = event.DOM;
+                const textArea1 = this.#textAreaList[0];
+                const text = textArea1.value;
+                this.#isGeezScript = this.isGeezScript(text);
+                if (this.#isGeezScript) {
+                    logger.info("Amharic Geez script detected");
+                    this.publishEvent("GeezScript", { type: "GeezScript", DOM: this.#textAreaList[0] });
+                }
+                break;
+        }
+    }
+}
+
+const geezScriptDetector = new GeezScriptDetector();
+geezScriptDetector.subscribeEvent("TextArea");
 
 
-//--------------------------------------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class TextAreaDetector {
     constructor() {
         this.textAreaList = [];
@@ -271,7 +361,7 @@ const message = {
 }
 console.log(logger);
 
-//---------------------------------------------------------------------------------------------------
+//---------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 // sending log messages to the background script
@@ -280,4 +370,4 @@ setInterval(function() {
     chrome.runtime.sendMessage({command: "sendLogger", logger: logger.getLogMessages()}, function(response) {
         console.log(response.result);
     });
-}, 60000); // 60000 milliseconds = 1 minute
+}, 10000); 
