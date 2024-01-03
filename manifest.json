@@ -12,14 +12,12 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-  
-      "js": ["./src/components/TextAreaDetector/textAreaDetector.js", "./src/events/EventDispatcher/EventDispatcher.js", "./src/events/EventDispatcher/channels.js", "./src/events/event/event.js", "src/components/Logger/logger.js"],
-      "type": "module"
+      "js": ["./src/components/TextAreaDetector/textAreaDetector.js"],
+      "run_at": "document_end"
 
     }
   ],
   "background": {
-    "service_worker": "./src/background/backgroundScript.js",
-    "type" :"module"
+    "service_worker": "./src/background/backgroundScript.js"
   }
 }
