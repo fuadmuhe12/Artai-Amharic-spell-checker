@@ -1,3 +1,4 @@
+
 //---------------------------------------------------------------------------------------------------------------------
 // logger class
 // Enum for log levels
@@ -53,7 +54,29 @@ class Logger {
 const logger = new Logger();
 window.logger = logger;
 console.log(logger);
-//-------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------
+//፟-------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------
+const div = document.createElement("div");
+div.setAttribute("id", "artai_main");
+// shadow.appendChild(div);
+
+document.lastChild.appendChild(div);
+const element = document.getElementById("artai_main");
+
+const shadow = element.attachShadow({ mode: "open" });
+
+const shadowRoot = element.shadowRoot;
+console.log(shadowRoot, "shadowRoot");
+logger.info("shadow root is created");
+let div2 = document.createElement("div");
+
+div2.setAttribute("id", "artai_full");
+div2.style =
+    "position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; ";
+shadow.appendChild(div2);
+const element2 = shadowRoot.querySelector("#artai_full");
+
+
+//__ ፟===============================================================================================================================================================================================
 
 // Class for text area detector in web page
 // ---------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------
@@ -127,7 +150,7 @@ class EventDispatcher {
             if (element.channelName === channelName) {
                 channelFound = true;
                 element.subscribers.forEach(function (subscriber) {
-                    logger.info("Event handler is called");
+                    logger.info(`Event is published is published to handle the channel ${channelName} `);
                     subscriber.handleEvent(event);
                     // the handleEvent function should be implemented in the subscriber class
                 });
@@ -169,7 +192,7 @@ class UserInterfaceManager {
         this.eventDispatcher.subscribe(channel, this);
     }
     publishEvent(payload) {
-        this.eventDispatcher.publishEvent("UIEvent", payload);
+        this.eventDispatcher.publishEvent("MisspelledWord", payload);
     }
     handleEvent(event) {
         console.log("userinterafce manager , handle event started");
@@ -179,6 +202,7 @@ class UserInterfaceManager {
         switch (event.type) {
             case "textArea":
                 console.log("text area event is started");
+                logger.info("text area is detected and spellcheck is activated")
                 this.#textAreaList = event.DOM;
                 const textArea1 = this.#textAreaList[0];
                 // initialize the spellcheck status
@@ -221,10 +245,21 @@ class UserInterfaceManager {
                 // if GeezScript is detected, activate the spellcheck to send the text to the server
                 this.#GeezScript = event.DOM;
                 this.#GeezScript = true;
+                logger.info(`misspelled word being sent to the chennel MisspelledWord `)
+                console.log(this.#textAreaList, "from userInterfaceManager class the text list");
+                let messageTo = {
+                    type: "MisspelledWord",
+                    data: new Set(["አማርኛ", "አማርኛ", "hello", "how", "ok"]),
+                    DOM: this.#textAreaList
+                }
+
+                this.publishEvent(messageTo);
+
         }
     }
     sendToCommunicationManager(text) {
         message = {
+
             type: "scanText",
             data: text,
         };
@@ -379,11 +414,13 @@ class HighlighterManager {
     #textAreaList = [];
 
     highlight() {
-
-        if (text_Area.length > 0) {
+        // log evry momoment for debuuig 
+        logger.info("highlighter is activated: now inside highlight function");
+        let text_Area = this.#textAreaList[0];
+        console.log(text_Area, "the text are inside hight function")
+        // if the text Area is defined 
+        if (text_Area !== undefined) {
             let misspelled_words = this.#misspelledWordList;
-            let text_Area = this.#textAreaList[0];
-
             if (misspelled_words.size === 0) {
                 logger.info("No misspelled words to highlight");
                 element4.innerHTML = "";
@@ -396,23 +433,8 @@ class HighlighterManager {
 
             const text_AreaPos = text_Area.getBoundingClientRect();
 
-            const div = document.createElement("div");
-            div.setAttribute("id", "artai_main");
-            // shadow.appendChild(div);
-
-            document.lastChild.appendChild(div);
-            const element = document.getElementById("artai_main");
-
-            const shadow = element.attachShadow({ mode: "open" });
-
-            const shadowRoot = element.shadowRoot;
-            let div2 = document.createElement("div");
-
-            div2.setAttribute("id", "artai_full");
-            div2.style =
-                "position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; ";
-            shadow.appendChild(div2);
-            const element2 = shadowRoot.querySelector("#artai_full");
+           
+            logger.info("creating the divs for misspelled words: inside highlight function");
 
             // create a div to host misspelled words
 
@@ -431,10 +453,15 @@ class HighlighterManager {
             element3.appendChild(divs);
 
             // place where the div of misspelled words will be stored
+            // console.log('This is fine')
             const element4 = shadowRoot.querySelector(
-                "#artai_misspelles_words_store"
-            )(
+                "#artai_misspelles_words_store");
+            logger.info("divs for misspelled store created: inside highlight function: next is problem place!!!");
+
+                
+
                 (function () {
+
                     // We'll copy the properties below into the mirror div.
                     // Note that some browsers, such as Firefox, do not concatenate properties
                     // into their shorthand (e.g. padding-top, padding-bottom etc. -> padding),
@@ -480,8 +507,8 @@ class HighlighterManager {
                         "MozTabSize",
                     ];
 
-                    var isBrowser = typeof window !== "undefined";
-                    var isFirefox = isBrowser && window.mozInnerScreenX != null;
+                    var isBrowser = typeof(window) !== "undefined";
+                    var isFirefox = isBrowser && (window.mozInnerScreenX != null);
 
                     function getCaretCoordinates(element, position, options) {
                         if (!isBrowser) {
@@ -569,13 +596,13 @@ class HighlighterManager {
                         div.appendChild(span);
 
                         var coordinates = {
-                            top: span.offsetTop + parseInt(computed["borderTopWidth"]),
-                            left: span.offsetLeft + parseInt(computed["borderLeftWidth"]),
-                            height: parseInt(computed["lineHeight"]),
+                            top: span.offsetTop + parseInt(computed['borderTopWidth']),
+                            left: span.offsetLeft + parseInt(computed['borderLeftWidth']),
+                            height: parseInt(computed['lineHeight'])
                         };
 
                         if (debug) {
-                            span.style.backgroundColor = "#aaa";
+                            span.style.backgroundColor = '#aaa';
                         } else {
                             document.body.removeChild(div);
                         }
@@ -586,16 +613,16 @@ class HighlighterManager {
                         };
                     }
 
-                    if (
-                        typeof module != "undefined" &&
-                        typeof module.exports != "undefined"
-                    ) {
+                    if (typeof module != 'undefined' && typeof module.exports != 'undefined') {
                         module.exports = getCaretCoordinates;
                     } else if (isBrowser) {
                         window.getCaretCoordinates = getCaretCoordinates;
                     }
-                })()
-            );
+
+                }());
+
+                
+
 
             function getTextNodeMetrics(element, misspelled_words) {
                 const words = element.innerText.split(/(\s+)/);
@@ -630,11 +657,13 @@ class HighlighterManager {
 
                 return metrics;
             }
-            var diq = document.createElement("div");
 
+            logger.info("creating the divs: for mirrowr : inside highlight function");
+            var diq = document.createElement("div");
+            logger.info("start of change function: inside highlight function");
             function change() {
                 element4.innerHTML = "";
-                mirror = getCaretCoordinates(text_Area, text_Area.selectionStart).div;
+                let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart).div;
                 console.log(mirror, "the mirror");
                 if (diq.textContent !== mirror.textContent) {
                     diq.textContent = mirror.textContent;
@@ -652,9 +681,9 @@ class HighlighterManager {
                     create_misspelled_divs(wors);
                 }
             }
-
+            logger.info("end of change function: inside highlight function");
             // Callback function to be executed when textarea size changes
-
+            logger.info("start of resize observer: inside highlight function");
             // Create a ResizeObserver with the callback function
             const resizeObserver = new ResizeObserver(change);
 
@@ -663,12 +692,14 @@ class HighlighterManager {
 
             // Event listener for text input
             text_Area.addEventListener("input", change);
+            logger.info("end of resize observer: inside highlight function");
             // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
             // set of misspled words tobe highlighted
 
 
             function create_misspelled_divs(name) {
+                logger.info("creating the divs for misspelled to be highlighted: inside create_misspelled_divs function");
                 // name is each word in the text area that are misspelled with their position
                 let misspelled_word = document.createElement("div");
                 misspelled_word.id = `artai_misspelled_word${name.ID}`; // need to have additonal id for each word
@@ -697,6 +728,7 @@ class HighlighterManager {
         }
         else {
             logger.warn("No text area is found");
+            
         }
     }
     removehighlight(word) {
@@ -709,25 +741,28 @@ class HighlighterManager {
 
     }
     handleEvent(event) {
+        logger.info(`highlighter manager is handling the event ${event.type} `)
+        console.log(event, "event from highlighter manager");
         switch (event.type) {
             case "MisspelledWord":
+
                 logger.info("Misspelled word is received from the server")
                 this.#textAreaList = event.DOM;
                 this.#misspelledWordList = event.data
                 this.highlight();
-
                 break;
             case "SuggestionSelected":
                 logger.info(`suggestion is selected by user and selected word : ${event.data}`)
                 this.removehighlight(event.data);
                 break;
         }
+        logger.info(`highlighter manager has finished handling the event ${event.type} `)
 
     }
 
 
 
-} 
+}
 const highlighterManager = new HighlighterManager();
 highlighterManager.subscribeEvent("MisspelledWord");
 highlighterManager.subscribeEvent("SuggestionSelected")
