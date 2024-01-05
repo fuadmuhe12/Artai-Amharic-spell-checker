@@ -442,7 +442,13 @@ class HighlighterManager {
             div3.setAttribute("id", "textarea");
 
             div3.style = ` top: ${text_AreaPos.top}px; left: ${text_AreaPos.left}px; width: ${text_AreaPos.width}px; height: ${text_AreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
-            element2.appendChild(div3);
+            //check if there is no the div with the same id 
+            if ((shadowRoot.querySelector("#textarea")) === null){
+                element2.appendChild(div3);
+            }
+
+
+            
             // Finding the text area place where the misspelled words will be highlighted
 
             const element3 = shadowRoot.querySelector("#textarea");
@@ -450,7 +456,10 @@ class HighlighterManager {
             divs.style =
                 "position: absolute; top: 0px; left: 0px; height: 700px; width: 1500px; ";
             divs.setAttribute("id", "artai_misspelles_words_store");
-            element3.appendChild(divs);
+            if ((shadowRoot.querySelector("#artai_misspelles_words_store")) == null){
+                element3.appendChild(divs);
+            }
+            
 
             // place where the div of misspelled words will be stored
             // console.log('This is fine')
@@ -625,7 +634,9 @@ class HighlighterManager {
 
 
             function getTextNodeMetrics(element, misspelled_words) {
+
                 const words = element.innerText.split(/(\s+)/);
+                console.log(words, "the words ፍሮም")
                 const metrics = []; // Initialize as an array
                 const divRect = element.getBoundingClientRect(); // Get the div's position
                 let ID = 0;
@@ -662,8 +673,9 @@ class HighlighterManager {
             var diq = document.createElement("div");
             logger.info("start of change function: inside highlight function");
             function change() {
+                
                 element4.innerHTML = "";
-                let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart).div;
+                let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart,{debug:true} ).div;
                 console.log(mirror, "the mirror");
                 if (diq.textContent !== mirror.textContent) {
                     diq.textContent = mirror.textContent;
@@ -675,6 +687,7 @@ class HighlighterManager {
 
                 console.log(diq, "the diq");
                 const vals = getTextNodeMetrics(diq, misspelled_words);
+                console.log(misspelled_words, "misspeled word inisede change")
                 console.log(vals, "vals");
                 for (const wors of vals) {
                     console.log(wors);
@@ -704,7 +717,12 @@ class HighlighterManager {
                 let misspelled_word = document.createElement("div");
                 misspelled_word.id = `artai_misspelled_word${name.ID}`; // need to have additonal id for each word
                 misspelled_word.style = `top: ${name.top}px; left: ${name.left}px; width: ${name.width}px; height: ${name.height}px; border-bottom: 2px solid red; position: absolute; `;
-                element4.appendChild(misspelled_word);
+                // if the misspelled word div with id of misspelled_word already there dont' add
+                if (shadowRoot.querySelector(`#artai_misspelled_word${name.ID}`) === null) {
+                    element4.appendChild(misspelled_word);
+                }
+
+                
 
                 let element5 = shadowRoot.querySelector(
                     `#artai_misspelled_word${name.ID}`

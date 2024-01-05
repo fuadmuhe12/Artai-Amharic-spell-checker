@@ -1,7 +1,12 @@
 //-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 // class of spellcheckCommunicationManager
 class spellcheckCommunicationManager{
-
+    #textForScanning;
+    #correctedText;
+    #APImanager = new spellcheckAPIManager(); // to be implemented
+    sendTextforScanning(text){
+        
+    };
 }
 //-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 var helow = "name"
