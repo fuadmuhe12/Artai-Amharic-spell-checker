@@ -53,7 +53,7 @@ class Logger {
 const logger = new Logger();
 window.logger = logger;
 console.log(logger);
-//፟-------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------
 const div = document.createElement("div");
 div.setAttribute("id", "artai_main");
 // shadow.appendChild(div);
@@ -182,7 +182,6 @@ class UserInterfaceManager {
     #textAreaList = [];
     #GeezScript = null;
     #misspelledWordList = {};
-    spellcheckCommunicationManager = "new SpellcheckCommunicationManager()";
     eventDispatcher = EventDispatcherObj;
     activateSpellcheck() {
         this.#spellcheckStatus = true;
@@ -248,33 +247,36 @@ class UserInterfaceManager {
                 this.#GeezScript = event.DOM;
                 this.#GeezScript = true;
                 logger.info(
-                    `misspelled word being sent to the chennel MisspelledWord `
+                    `Text is about to be sent to the backgroung script for analysing`
                 );
-                console.log(
-                    this.#textAreaList,
-                    "from userInterfaceManager class the text list"
-                );
-                let trial_data = new Set(["አማርኛ", "አማርኛ", "hello", "how", "ok", "yes", "no", "ok", "y", "n", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom"]);
-                let messageTo = {
-                    type: "MisspelledWord",
-                    data: trial_data,
-                    DOM: this.#textAreaList,
-                };
-
-                this.publishEvent(messageTo);
+              this.sendToCommunicationManager()
         }
     }
     sendToCommunicationManager(text) {
-        message = {
-            type: "scanText",
+        let message = {
+            type: "textforScanning",
             data: text,
         };
         logger.info("sending text to communication manager to scan the text");
         chrome.runtime.sendMessage(message, function (response) {
             logger.info(
-                `recieved responce from communication manager: ${response.result}`
+                `recieved response from communication manager: ${response.result}`
             );
         });
+    }
+    recieveMessageFromCommunicationManager() {
+        chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+            if (request.type === "misspelledWords") {
+                logger.info(`recieved misspelled words from communication manager`);
+                console.log(request.data, " from the communicatio manager ")
+                sendResponse({ result: "success" })
+                
+                // TODO: send the recieved data to the correct place
+
+
+            }
+
+        })
     }
 }
 
@@ -282,6 +284,7 @@ const userInterfaceManager = new UserInterfaceManager();
 
 userInterfaceManager.subscribeEvent("TextArea");
 userInterfaceManager.subscribeEvent("GeezScript");
+userInterfaceManager.recieveMessageFromCommunicationManager();
 //---------------------------------------------//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //class for GeezScriptDetector
 
@@ -682,7 +685,7 @@ class HighlighterManager {
 
             // Finding the text area place where the misspelled words will be highlighted
 
-             this.element3 = shadowRoot.querySelector("#textarea");
+            this.element3 = shadowRoot.querySelector("#textarea");
             var divs = document.createElement("div");
             divs.style =
                 "position: absolute; top: 0px; left: 0px; height: 700px; width: 1500px; ";
@@ -693,7 +696,7 @@ class HighlighterManager {
 
             // place where the div of misspelled words will be stored
             // console.log('This is fine')
-             this.element4 = shadowRoot.querySelector(
+            this.element4 = shadowRoot.querySelector(
                 "#artai_misspelles_words_store"
             );
             // ===============================================================================================================================================================================================
@@ -714,7 +717,7 @@ class HighlighterManager {
             document.body.appendChild(diq);
             logger.info("start of change function: inside highlight function");
             //===========================================================================================================================================================================================================
-            
+
 
             function change() {
                 text_AreaPos = text_Area.getBoundingClientRect();
@@ -821,14 +824,14 @@ class HighlighterManager {
                 console.log(rect, "the rect of each   word")
 
                 metrics.push({
-                    ID:id,
+                    ID: id,
                     word: word,
                     top: rect.top - divRect.top, // Subtract the div's top
                     left: rect.left - divRect.left, // Subtract the div's left
                     width: rect.width,
                     height: rect.height
                 });
-               
+
             }
             id += 1
         });
