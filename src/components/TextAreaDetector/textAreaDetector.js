@@ -710,6 +710,7 @@ class HighlighterManager {
 
             logger.info("creating the divs: for mirrowr : inside highlight function");
             var diq = document.createElement("div");
+            diq.style = "position: absolute; opacity: 0; pointer-events: none; z-index: -9999; top: 0px; left: 0px; "
             document.body.appendChild(diq);
             logger.info("start of change function: inside highlight function");
             //===========================================================================================================================================================================================================
@@ -724,8 +725,8 @@ class HighlighterManager {
 
 
 
-                console.log(getCaretCoordinates(text_Area, text_Area.selectionStart, {debug:true}).div, "the mirro sfvsfdvsfdv r")
-                let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart, {debug:true}, {debug:true}).div
+                console.log(getCaretCoordinates(text_Area, text_Area.selectionStart).div, "the mirro sfvsfdvsfdv r")
+                let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart).div
                 console.log(mirror, "the mirror")
                 if (diq.textContent !== mirror.textContent) {
                     diq.textContent = mirror.textContent;
