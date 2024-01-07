@@ -46,10 +46,10 @@ class Logger {
 
     // Clear stored log messages
     clearLogMessages() {
-        if (this.logMessages.length > 500){
-            this.logMessages = this.logMessages.slice(400,undefined)
+        if (this.logMessages.length > 500) {
+            this.logMessages = this.logMessages.slice(400, undefined)
         }
-        
+
     }
 }
 
@@ -185,7 +185,7 @@ class UserInterfaceManager {
     #textAreaList = [];
     #GeezScript = null;
     #misspelledWordList = new Set();
-    #suggestedList  = []
+    #suggestedList = []
     eventDispatcher = EventDispatcherObj;
     activateSpellcheck() {
         this.#spellcheckStatus = true;
@@ -196,8 +196,8 @@ class UserInterfaceManager {
     subscribeEvent(channel) {
         this.eventDispatcher.subscribe(channel, this);
     }
-    publishEvent(payload) {
-        this.eventDispatcher.publishEvent("MisspelledWord", payload);
+    publishEvent(payload, channelName) {
+        this.eventDispatcher.publishEvent(channelName, payload);
     }
     handleEvent(event) {
         console.log("userinterafce manager , handle event started");
@@ -253,7 +253,7 @@ class UserInterfaceManager {
                 logger.info(
                     `Text is about to be sent to the backgroung script for analysing`
                 );
-              this.sendToCommunicationManager()
+                this.sendToCommunicationManager()
         }
     }
     sendToCommunicationManager(text) {
@@ -274,15 +274,28 @@ class UserInterfaceManager {
         this.#misspelledWordList.clear();
         this.#suggestedList = []
 
-        for(let error of receivedErrors){
-           this.#misspelledWordList.add(error.word);
-           this.#suggestedList.push(error.suggestions)
+        for (let error of receivedErrors) {
+            this.#misspelledWordList.add(error.word);
+            this.#suggestedList.push(error.suggestions)
         }
         // handle the postimg of the misspelled words
-        // TODO: implement this function
+        // TODO: implement publishEvent function for suggestion
+        let messageForMisspelled = {
+            DOM: this.#textAreaList,
+            type: "MisspelledWord",
+            data: this.#misspelledWordList,
+        };// this to be highlited 
+
+        let messageForSuggestion = {
+            //for to be decided
+            // TODO: implement this for the suggestion format
+        }
+
+        this.publishEvent(messageForMisspelled, "MisspelledWord")
+        this.publishEvent()
 
 
-        
+
     }
 }
 
@@ -400,13 +413,9 @@ class TextAreaDetector {
 
             if (this.textAreaList.length > 0) {
                 //=================================================================================================================================================================================================================
-                let textArea1 = this.textAreaList[0];
-                textArea1.value = "አማርኛ አማርኛ  ok yes no ok y n why what where";
-                console.log(textArea1, "text area 1 from textAreaDetector class to get the position of the words")
-                highlighterManager.getTextNodeMetrics(textArea1, new Set(["አማርኛ", "አማርኛ", "hello", "how", "ok", "yes", "no", "ok", "y", "n", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom", "why", "what", "where", "when", "how", "who", "this", "that", "these", "those", "here", "there", "which", "whose", "whom"]));
                 let textArea = this.textAreaList[0];
                 let textAreaPos = textArea.getBoundingClientRect()
-                console.log(textAreaPos, "text area posotion ")
+                logger.info("creating the shadow root for text area: inside TextAreaDetector function");
                 let div3 = document.createElement("div");
                 div3.setAttribute("id", "textarea");
 
@@ -439,11 +448,7 @@ class TextAreaDetector {
     }
 }
 const textAreaDetector = new TextAreaDetector();
-const message = {
-    type: "TextArea",
-    data: textAreaDetector,
-};
-console.log(logger);
+
 
 //---------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // misspelled word highlighter class
@@ -458,31 +463,7 @@ class HighlighterManager {
 
 
     //===========================================================================================================================================================================================================
-    //  getTextNodeMetrics(element, words_need) {
-    //     const words = element.innerText.split(/(\s+)/);
-    //     const metrics = []; // Initialize as an array
-    //     const divRect = element.getBoundingClientRect(); // Get the div's position
 
-    //     words.forEach((word, index) => {
-    //       if (words_need.has(word)) {
-    //         const range = document.createRange();
-    //         range.setStart(element.firstChild, words.slice(0, index).join('').length);
-    //         range.setEnd(element.firstChild, words.slice(0, index + 1).join('').length);
-
-    //         const rect = range.getBoundingClientRect();
-
-    //         metrics.push({
-    //           word: word,
-    //           top: rect.top - divRect.top, // Subtract the div's top
-    //           left: rect.left - divRect.left, // Subtract the div's left
-    //           width: rect.width,
-    //           height: rect.height
-    //         });
-    //       }
-    //     });
-
-    //     return metrics;
-    //   }
     //===========================================================================================================================================================================================================
 
     highlight() {
@@ -782,7 +763,9 @@ class HighlighterManager {
         );
         // name is each word in the text area that are misspelled with their position
         let misspelled_word = document.createElement("div");
-        misspelled_word.id = `artai_misspelled_word${name.ID}`; // need to have additonal id for each word
+        misspelled_word.id = `artai_misspelled_word${name.ID}`; 
+        misspelled_word.setAttribute('data-misspelledPlace',`${name.ID}` ) // place of the word only from the misspelled words 
+        misspelled_word.setAttribute('data-wordPlace', `${name.word_ID}`) // place of the word from all of the word 
         misspelled_word.style = `top: ${name.top}px; left: ${name.left}px; width: ${name.width}px; height: ${name.height}px; border-bottom: 2px solid red; position: absolute; `;
         // if the misspelled word div with id of misspelled_word already there dont' add
         if (
@@ -794,20 +777,21 @@ class HighlighterManager {
         let element5 = shadowRoot.querySelector(
             `#artai_misspelled_word${name.ID}`
         );
-        console.log(element5, "element5");
+
+        
         let misspelled_word_inner = document.createElement("div");
-        misspelled_word_inner.id = `artai_misspelled_word_inner${name.ID}`; // need to have additonal id for each word
+        misspelled_word_inner.id = `artai_misspelled_word_inner${name.ID}`; 
         //add class attribute to the div
         misspelled_word_inner.classList.add("highlight_red");
         element5.appendChild(misspelled_word_inner);
 
         let element6 = shadowRoot.querySelector(
             `artai_misspelled_word_inner${name.ID}`
-        ); //need to have additonal id for each word
+        );
         //add event listener to the for mouse hover
 
         misspelled_word_inner.addEventListener("mouseover", function () {
-            misspelled_word_inner.style = "background-color:yellow";
+            misspelled_word_inner.style.backgroundColor = "yellow";
         });
     }
     //===========================================================================================================================================================================================================
@@ -820,26 +804,29 @@ class HighlighterManager {
         const divRect = element.getBoundingClientRect(); // Get the div's position
         console.log(divRect, "the text are posiiton inside positio function")
         let id = 0;
+        let word_ID = 0;
         words.forEach((word, index) => {
             if (words_need.has(word)) {
+
                 const range = document.createRange();
                 range.setStart(element.firstChild, words.slice(0, index).join('').length);
                 range.setEnd(element.firstChild, words.slice(0, index + 1).join('').length)
-
                 const rect = range.getBoundingClientRect();
-                console.log(rect, "the rect of each   word")
+                
 
                 metrics.push({
                     ID: id,
+                    word_ID:word_ID,
                     word: word,
                     top: rect.top - divRect.top, // Subtract the div's top
                     left: rect.left - divRect.left, // Subtract the div's left
                     width: rect.width,
                     height: rect.height
                 });
+                word_ID += 1 // to keep track each word or space location 
 
             }
-            id += 1
+            id += 1  // keep track of only misspelled words
         });
 
         return metrics;
@@ -855,6 +842,12 @@ class HighlighterManager {
         EventDispatcherObj.subscribe(channel, this);
     }
     handleEvent(event) {
+        /* messageFormat = {
+             type: "the type of the event",
+             data: "the data of the event",
+             DOM: "the DOM of the event",
+         }
+         */
         logger.info(`highlighter manager is handling the event ${event.type} `);
         console.log(event, "event from highlighter manager");
         switch (event.type) {
@@ -880,7 +873,20 @@ const highlighterManager = new HighlighterManager();
 highlighterManager.subscribeEvent("MisspelledWord");
 
 
+//----------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// class for suggestion manager
+class  SuggestionsManager{
+    #suggestionList = [];
 
+    showSuggestions(){
+        // show the suggestion list
+        // TODO: implement this function
+    }
+
+    
+
+
+}
 //- --------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // sending log messages to the background script
@@ -899,7 +905,7 @@ setInterval(function () {
 // --------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 chrome.runtime.onMessage.addEventListener(function (request, sender, sendResponse) {
 
-    if(request.type === "correctedText"){
+    if (request.type === "correctedText") {
         // send to the user interface manager
         // TODO: send the recieved data to the correct place
     }
