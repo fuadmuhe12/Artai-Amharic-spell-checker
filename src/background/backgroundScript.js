@@ -50,16 +50,53 @@ class Logger {
 const backgroundLogger = new Logger();
 backgroundLogger.log("background script loaded");
 
+//-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
+// class of spellcheckAPIManager
+class SpellcheckAPIManager{
+    sentData;//to the Engine
+    recievedData // from the  Engine
+    sendRequestToEngine(text){
+        //send text to the Engine
+        // TODO: implement this function
+    };
+    recieveresposeFromEngine(){
+        //recieve text from the Engine
+        // TODO: implement this function
+    }
+
+    
+
+
+};
+const spellcheckAPIManager = new SpellcheckAPIManager();
+    
 
 //-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 // class of spellcheckCommunicationManager
 class SpellcheckCommunicationManager{
     textForScanning;
     correctedText;
-    APImanager = new spellcheckAPIManager(); // TODO: implement this class
+    spellcheckAPIManager = spellcheckAPIManager; // TODO: implement this class
     sendTextforScanning(text){
-        
+        // send text to the spellcheckAPIManager
+        // TODO: implement this function
     };
+    recieveCorrectedText(){
+        // recieve text from the spellcheckAPIManager
+        // TODO: implement this function   
+    }
+    sendCorrectedText(){
+        // send text to the content script
+        let messageToContentScript = {
+            type: "correctedText",
+            correctedText: this.correctedText
+        };
+        chrome.runtime.sendMessage(messageToContentScript, backgroundLogger.info("corrected text sent to content script"));
+        
+        
+
+    }
+    
 }
 const spellcheckCommunicationManager = new SpellcheckCommunicationManager();
 
@@ -83,7 +120,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         sendResponse({result: `succesfully received text ${text} from content script `});
         spellcheckCommunicationManager.textForScanning = text;
 
-        
     }
 });
 console.log("background script loaded");

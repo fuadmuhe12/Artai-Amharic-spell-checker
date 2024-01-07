@@ -46,7 +46,10 @@ class Logger {
 
     // Clear stored log messages
     clearLogMessages() {
-        this.logMessages = [];
+        if (this.logMessages.length > 500){
+            this.logMessages = this.logMessages.slice(400,undefined)
+        }
+        
     }
 }
 
@@ -181,7 +184,8 @@ class UserInterfaceManager {
     #spellcheckStatus = false;
     #textAreaList = [];
     #GeezScript = null;
-    #misspelledWordList = {};
+    #misspelledWordList = new Set();
+    #suggestedList  = []
     eventDispatcher = EventDispatcherObj;
     activateSpellcheck() {
         this.#spellcheckStatus = true;
@@ -264,19 +268,21 @@ class UserInterfaceManager {
             );
         });
     }
-    recieveMessageFromCommunicationManager() {
-        chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-            if (request.type === "misspelledWords") {
-                logger.info(`recieved misspelled words from communication manager`);
-                console.log(request.data, " from the communicatio manager ")
-                sendResponse({ result: "success" })
-                
-                // TODO: send the recieved data to the correct place
+    recieveMessageFromCommunicationManager(result) {
+        let sentText = result.text;
+        let receivedErrors = result.errors;
+        this.#misspelledWordList.clear();
+        this.#suggestedList = []
+
+        for(let error of receivedErrors){
+           this.#misspelledWordList.add(error.word);
+           this.#suggestedList.push(error.suggestions)
+        }
+        // handle the postimg of the misspelled words
+        // TODO: implement this function
 
 
-            }
-
-        })
+        
     }
 }
 
@@ -886,4 +892,15 @@ setInterval(function () {
             console.log(response.result);
         }
     );
+    // Clear the log messages
+    logger.clearLogMessages();
 }, 10000);
+
+// --------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+chrome.runtime.onMessage.addEventListener(function (request, sender, sendResponse) {
+
+    if(request.type === "correctedText"){
+        // send to the user interface manager
+        // TODO: send the recieved data to the correct place
+    }
+})
