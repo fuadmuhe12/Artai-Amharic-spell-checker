@@ -67,6 +67,13 @@ const element = document.getElementById("artai_main");
 const shadow = element.attachShadow({ mode: "open" });
 
 const shadowRoot = element.shadowRoot;
+//==========================================================================================================================================================================================================
+// add the css file to the shadow root
+let linkElem = document.createElement('link');
+linkElem.setAttribute('rel', 'stylesheet');
+linkElem.setAttribute('href', '../../styles/style.css');
+shadowRoot.appendChild(linkElem);
+//==========================================================================================================================================================================================================
 console.log(shadowRoot, "shadowRoot");
 logger.info("shadow root is created");
 let div2 = document.createElement("div");
@@ -279,31 +286,37 @@ class UserInterfaceManager {
             this.#suggestedList.push(error.suggestions)
         }
         // handle the postimg of the misspelled words
-        // TODO: implement publishEvent function for suggestion
+
         let messageForMisspelled = {
             DOM: this.#textAreaList,
-            type: "MisspelledWord",
-            data: this.#misspelledWordList,
+            type: "MisspelledWord and suggestion",
+            misspelledData : this.#misspelledWordList,
+            suggestionData : this.#suggestedList
         };// this to be highlited 
 
         let messageForSuggestion = {
             //for to be decided
-            // TODO: implement this for the suggestion format
-        }
-
+            DOM: this.#textAreaList,
+            type: "Suggestion",
+            data: this.#suggestedList,
+        };
         this.publishEvent(messageForMisspelled, "MisspelledWord")
-        this.publishEvent()
-
-
-
+        this.publishEvent(messageForSuggestion, "Suggestion")
     }
+
 }
+
+
+
+
+
+
 
 const userInterfaceManager = new UserInterfaceManager();
 
 userInterfaceManager.subscribeEvent("TextArea");
 userInterfaceManager.subscribeEvent("GeezScript");
-userInterfaceManager.recieveMessageFromCommunicationManager();
+
 //---------------------------------------------//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //class for GeezScriptDetector
 
@@ -454,6 +467,7 @@ const textAreaDetector = new TextAreaDetector();
 // misspelled word highlighter class
 class HighlighterManager {
     #misspelledWordList = new Set();
+    #suggestedList = []
     #textAreaList = [];
     element = element;
     element2 = element2;
@@ -641,7 +655,6 @@ class HighlighterManager {
         // log evry momoment for debuuig
         logger.info("highlighter is activated: now inside highlight function");
         let text_Area = this.#textAreaList[0];
-        console.log(text_Area, "the text are inside hight function");
         // if the text Area is defined
         if (text_Area !== undefined) {
             let misspelled_words = this.#misspelledWordList;
@@ -694,7 +707,7 @@ class HighlighterManager {
 
 
 
-            text_Area.value = "አማርኛ አማርኛ ";
+            
 
 
 
@@ -728,11 +741,11 @@ class HighlighterManager {
                 }
 
                 console.log(diq, "the diq")
-                const vals = highlighterManager.getTextNodeMetrics(diq, misspelled_words)
+                const vals = highlighterManager.getTextNodeMetrics(diq, misspelled_words)// get the position of each word in the text area
                 console.log(vals, "vals")
-                for (const wors of vals) {
-                    console.log(wors)
-                    highlighterManager.create_misspelled_divs(wors)
+                for (let word = 0 ; word < vals.length; word++) {
+                    
+                    highlighterManager.create_misspelled_divs(vals[word], highlighterManager.#suggestedList[word] ) // create the divs for each misspelled word to be hightlited and also their suggestion
                 }
             }
 
@@ -757,41 +770,88 @@ class HighlighterManager {
     // ===============================================================================================================================================================================================
     // set of misspled words tobe highlighted
 
-    create_misspelled_divs(name) {
+    create_misspelled_divs(name, suggestionList) {
         logger.info(
-            "creating the divs for misspelled to be highlighted: inside create_misspelled_divs function"
+            "creating the divs for misspelled to be highlighted and also their sugggestion: inside create_misspelled_divs function"
         );
         // name is each word in the text area that are misspelled with their position
+        let misspelled_hub = document.createElement("div")
+        misspelled_hub.style = "width:100%; height:100%;"
+        misspelled_hub.id = `artai_misspelled_hub${name.ID}`
+        if (
+            shadowRoot.querySelector(`#artai_misspelled_hub${name.ID}`) === null
+        ) {
+            highlighterManager.element4.appendChild(misspelled_hub);
+        }
+        let element5 = shadowRoot.querySelector(
+            `#artai_misspelled_hub${name.ID}`
+        );
+        misspelled_word.classList.add("highlight_red");
+
         let misspelled_word = document.createElement("div");
-        misspelled_word.id = `artai_misspelled_word${name.ID}`; 
-        misspelled_word.setAttribute('data-misspelledPlace',`${name.ID}` ) // place of the word only from the misspelled words 
+        misspelled_word.id = `artai_misspelled_word${name.ID}`;
+        misspelled_word.setAttribute('data-misspelledPlace', `${name.ID}`) // place of the word only from the misspelled words 
         misspelled_word.setAttribute('data-wordPlace', `${name.word_ID}`) // place of the word from all of the word 
         misspelled_word.style = `top: ${name.top}px; left: ${name.left}px; width: ${name.width}px; height: ${name.height}px; border-bottom: 2px solid red; position: absolute; `;
         // if the misspelled word div with id of misspelled_word already there dont' add
         if (
             shadowRoot.querySelector(`#artai_misspelled_word${name.ID}`) === null
         ) {
-            highlighterManager.element4.appendChild(misspelled_word);
+            element5.appendChild(misspelled_word);
+        }
+        
+
+        let suggestion_div = document.createElement("div");
+        // show the suggestion in absolute position below the word, without any space separation between the two
+        suggestion_div.style = `position:absolute; top: ${name.top + name.height -1}px; left: ${name.left - 10}px; `
+        suggestion_div.style.display = "none";
+        suggestion_div.dataset.suggestionPlace = `${name.ID}`;
+        suggestion_div.id = `artai_suggestion${name.ID}`;
+        suggestion_div.classList.add("suggestion_div");
+        suggestion_div.innerHTML = '<div class="text p-4 bg-white border  text-gray-500 shadow-md max-w-fit flex flex-col rounded-xl" >' +
+            '<div class="title text-lg font-bold px-5 mb-4">Correct your spelling</div>' +
+            '<ul class="text-center">' +
+            '<li class="text-2xl hover:bg-sky-200 hover:transition-colors rounded-lg font-mono hover:text-slate-900 "> the word</li>' + //FIXME:  to be removed
+            '</ul>' +
+            '<div class="flex flex-col gap-5 justify-between items-start mt-6">' +
+            '<div class="flex ">' +
+            '<span class="flex" id="add_to_dic">' +
+            '<img src="../Icons/add_to_dic.png" alt="add_to_dic" class="mr-2 size-10">' +
+            '<button class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold px-2 px- rounded" id="replace">Add to Dictionary</button>' +
+            '</span>' +
+            '</div>' +
+            '<div class="mx-auto my-3 ">' +
+            '<a class="btn btn-primary bg-teal-600 hover:bg-teal-800 text-white font-bold py-2 px-2 rounded" id="ignore">See more about Artai</a>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+
+        let ul = suggestion_div.querySelector('.text-center');
+        if (suggestionList.length > 0) {
+            suggestionList.forEach(suggestion => {
+                let li = document.createElement('li');
+                li.className = 'text-2xl hover:bg-sky-200 hover:transition-colors rounded-lg font-mono hover:text-slate-900';
+                li.textContent = suggestion;
+                ul.appendChild(li);
+            });
+        }
+        else {
+            let li = document.createElement('li');
+            li.className = 'text-2xl hover:bg-sky-200 hover:transition-colors rounded-lg font-mono hover:text-slate-900';
+            li.textContent = "No suggestion";
+            ul.appendChild(li);
+
+        }
+        if (
+            shadowRoot.querySelector(`#artai_suggestion${name.ID}`) === null
+        ) {
+            element5.appendChild(suggestion_div);
         }
 
-        let element5 = shadowRoot.querySelector(
-            `#artai_misspelled_word${name.ID}`
-        );
-
-        
-        let misspelled_word_inner = document.createElement("div");
-        misspelled_word_inner.id = `artai_misspelled_word_inner${name.ID}`; 
-        //add class attribute to the div
-        misspelled_word_inner.classList.add("highlight_red");
-        element5.appendChild(misspelled_word_inner);
-
-        let element6 = shadowRoot.querySelector(
-            `artai_misspelled_word_inner${name.ID}`
-        );
         //add event listener to the for mouse hover
 
-        misspelled_word_inner.addEventListener("mouseover", function () {
-            misspelled_word_inner.style.backgroundColor = "yellow";
+        misspelled_word.addEventListener("mouseover", function (event) {
+            event.target.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
         });
     }
     //===========================================================================================================================================================================================================
@@ -812,11 +872,11 @@ class HighlighterManager {
                 range.setStart(element.firstChild, words.slice(0, index).join('').length);
                 range.setEnd(element.firstChild, words.slice(0, index + 1).join('').length)
                 const rect = range.getBoundingClientRect();
-                
+
 
                 metrics.push({
                     ID: id,
-                    word_ID:word_ID,
+                    word_ID: word_ID,
                     word: word,
                     top: rect.top - divRect.top, // Subtract the div's top
                     left: rect.left - divRect.left, // Subtract the div's left
@@ -854,7 +914,8 @@ class HighlighterManager {
             case "MisspelledWord":
                 logger.info("Misspelled word is received from the server");
                 this.#textAreaList = event.DOM;
-                this.#misspelledWordList = event.data;
+                this.#misspelledWordList = event.misspelledData;
+                this.#suggestedList = event.suggestionData;
                 this.highlight();
                 break;
             case "SuggestionSelected":
@@ -875,15 +936,24 @@ highlighterManager.subscribeEvent("MisspelledWord");
 
 //----------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // class for suggestion manager
-class  SuggestionsManager{
+class SuggestionsManager {
     #suggestionList = [];
 
-    showSuggestions(){
+    showSuggestions() {
+
         // show the suggestion list
         // TODO: implement this function
     }
+    handleEvent(event) {
+        switch (event.type) {
+            case "suggestions":
+                this.#suggestionList = event.data;
 
-    
+        }
+
+    }
+
+
 
 
 }
