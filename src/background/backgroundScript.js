@@ -86,10 +86,26 @@ class SpellcheckCommunicationManager{
         // TODO: implement this function   
     }
     sendCorrectedText(){
+        backgroundLogger.log("sending corrected text to content script");
         // send text to the content script
         let messageToContentScript = {
             type: "correctedText",
-            correctedText: this.correctedText
+            correctedText: {
+                "result": {
+                  "text": "እኛ አለን እና ሰዎች ናቸው ። የሚሰሩ ሰዎች እና አሉ።",
+                  "errors": [
+                    {
+                      "word": "ናቸው",
+                      "suggestions": ["ናችው"]
+                    },
+                    {
+                      "word": "ሰዎች",
+                      "suggestions": ["ሰዋች"]
+                    }
+                  ]
+                }
+              }
+              
         };
         chrome.runtime.sendMessage(messageToContentScript, backgroundLogger.info("corrected text sent to content script"));
         
@@ -99,6 +115,7 @@ class SpellcheckCommunicationManager{
     
 }
 const spellcheckCommunicationManager = new SpellcheckCommunicationManager();
+spellcheckCommunicationManager.sendCorrectedText();
 
 //----//-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 
@@ -114,11 +131,36 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         sendResponse({result: "Logger received from background script"});
     }
     else if (request.type === "textforScanning") {
-        loggerMessages.log("text for scanning received from content script");
+        backgroundLogger.log("text for scanning received from content script");
         // Process the text
         var text = request.text;
         sendResponse({result: `succesfully received text ${text} from content script `});
-        spellcheckCommunicationManager.textForScanning = text;
+
+        // spellcheckCommunicationManager.textForScanning = text;
+        // demo 
+
+        backgroundLogger.log("sending corrected text to content script");
+        // send text to the content script
+        let messageToContentScript = {
+            type: "correctedText",
+            correctedText: {
+                "result": {
+                  "text": "እኛ አለን እና ሰዎች ናቸው ። የሚሰሩ ሰዎች እና አሉ።",
+                  "errors": [
+                    {
+                      "word": "ናቸው",
+                      "suggestions": ["ናችው"]
+                    },
+                    {
+                      "word": "ሰዎች",
+                      "suggestions": ["ሰዋች"]
+                    }
+                  ]
+                }
+              }
+              
+        };
+       // chrome.runtime.sendMessage(messageToContentScript, backgroundLogger.info("corrected text sent to content script")); FIXME: uncomment this line
 
     }
 });
