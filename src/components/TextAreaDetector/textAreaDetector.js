@@ -72,7 +72,7 @@ const shadowRoot = element.shadowRoot;
 logger.info("adding a css file to the shadow root")
 let linkElem = document.createElement('link');
 linkElem.setAttribute('rel', 'stylesheet');
-linkElem.setAttribute('href', '../../styles/style.css');
+linkElem.setAttribute('href', "C:/Users/fuaad/OneDrive/Desktop/js-class/folder/SpellCheckingExtension/src/styles/style.css");
 shadowRoot.appendChild(linkElem);
 //====================================//==========================================================================================================================================================================================================
 //adding a tailwind link to the shadow root
@@ -230,30 +230,12 @@ class UserInterfaceManager {
                 this.#spellcheckStatus = true;
                 // inject an image icon into the parent of text area
                 const parent = textArea1.parentElement;
-                const div = document.createElement("div");
-                div.setAttribute("id", "spellcheck-div");
+                
 
-                const icon = document.createElement("img");
-                icon.setAttribute(
-                    "src",
-                    "https://cdn.icon-icons.com/icons2/2645/PNG/512/textarea_t_text_icon_159809.png"
-                );
-                icon.setAttribute("id", "spellcheck-icon");
-                icon.setAttribute("title", "Artie Amharic Spellcheck");
-                icon.setAttribute(
-                    "style",
-                    "width: 20px; height: 20px; margin-left: 5px; cursor: pointer;"
-                );
-                div.appendChild(icon);
-                icon.addEventListener("mouseover", function () {
-                    this.style.backgroundColor = "lightgreen";
-                });
-                icon.addEventListener("mouseout", function () {
-                    this.style.backgroundColor = "";
-                });
+                
+              
 
-                // icon_inner =  " <img src = 'https://cdn.icon-icons.com/icons2/2645/PNG/512/textarea_t_text_icon_159809.png' id='spellcheck-icon' title = 'Amharic Spellcheck'  /> "
-                // div.innerHTML = icon_inner;
+                
                 console.log(div, "div");
                 parent.appendChild(div);
                 console.log(parent, "parent");
@@ -275,12 +257,16 @@ class UserInterfaceManager {
                     "errors": [
                         {
                             "word": "ናቸው",
-                            "suggestions": ["ናችው"]
+                            "suggestions": ['ሰዋች', 'ሳው', 'ስው']
                         },
                         {
                             "word": "ሰዎች",
-                            "suggestions": ["ሰዋች"]
+                            "suggestions": ['ናችህው' ,'ንችህ', 'ናችህስ' ]
                         }
+                        ,{
+                            "word": "ናቸው",
+                            "suggestions": ['ሰዋች', 'ሳው', 'ስው']
+                        },
                     ]
 
                 }
@@ -459,6 +445,29 @@ class TextAreaDetector {
                 logger.info("creating the shadow root for text area: inside TextAreaDetector function");
                 let div3 = document.createElement("div");
                 div3.setAttribute("id", "textarea");
+                let logo = document.createElement("img");
+                logo.setAttribute("src", "https://cdn.icon-icons.com/icons2/2645/PNG/512/textarea_t_text_icon_159809.png");
+                logo.setAttribute("id", "spellcheck-icon");
+                logo.setAttribute("title", "Artie Amharic Spellcheck");
+                logo.setAttribute("style", `width: 20px; height: 20px; margin-left: 5px; cursor: pointer; position: absolute; top: ${textAreaPos.top +textAreaPos.height -30 }px; left: ${textAreaPos.left + textAreaPos.width -33}px; `);
+                shadowRoot.appendChild(logo);
+
+                logo.addEventListener("mouseover", function () {
+                    //add the hover effect and scale up
+                    logo.style.transform = "scale(1.2)";
+                    logo.style.transition = "transform 0.5s";
+                    logo.style.backgroundColor = "rgb(31, 198, 101)";
+
+                });
+
+                logo.addEventListener("mouseout", function () {
+                    //remove the hover effect and scale down
+                    logo.style.transform = "scale(1)";
+                    
+                    logo.style.backgroundColor = "";
+                });
+               
+
 
                 div3.style = ` top: ${textAreaPos.top}px; left: ${textAreaPos.left}px; width: ${textAreaPos.width}px; height: ${textAreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
                 element2.appendChild(div3);
@@ -753,6 +762,9 @@ class HighlighterManager {
                 highlighterManager.element3.style = `top: ${text_AreaPos.top}px; left: ${text_AreaPos.left}px; width: ${text_AreaPos.width}px; height: ${text_AreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
 
                 highlighterManager.element4.innerHTML = ""
+                //up date the  posision of  logo icon
+                let logo = shadowRoot.querySelector("#spellcheck-icon");
+                logo.style = `width: 20px; height: 20px; margin-left: 5px; cursor: pointer; position: absolute; top: ${text_AreaPos.top + text_AreaPos.height - 30}px; left: ${text_AreaPos.left + text_AreaPos.width - 33}px; `;
 
 
 
@@ -842,7 +854,7 @@ class HighlighterManager {
 
         let suggestion_div = document.createElement("div");
         // show the suggestion in absolute position below the word, without any space separation between the two
-        suggestion_div.style = `position:fixed; top: ${name.top + name.height+5}px; left: ${name.left - 10}px; background-color: blue; border: 1px solid black; width: 200px; height: 200px; `
+        suggestion_div.style = `position:fixed; top: ${name.top + name.height+10}px; left: ${name.left - 10}px; `
         suggestion_div.style.display = "none";
         suggestion_div.style.zIndex = "99999";
         suggestion_div.dataset.suggestion = 'suggestion'
@@ -851,13 +863,12 @@ class HighlighterManager {
         suggestion_div.classList.add("suggestion_div");
         suggestion_div.innerHTML = '<div class="text p-4 bg-white border  text-gray-500 shadow-md max-w-fit flex flex-col rounded-xl"  >' +
             '<div class="title text-lg font-bold px-5 mb-4">Correct your spelling</div>' +
-            '<ul class="text-center">' +
-            '<li class="text-2xl hover:bg-sky-200 hover:transition-colors rounded-lg font-mono hover:text-slate-900 "> the word</li>' + //FIXME:  to be removed
+            '<ul class="text-center flex flex-col">' +
             '</ul>' +
             '<div class="flex flex-col gap-5 justify-between items-start mt-6">' +
             '<div class="flex ">' +
             '<span class="flex" id="add_to_dic">' +
-            '<img src="../Icons/add_to_dic.png" alt="add_to_dic" class="mr-2 size-10">' +
+            '<img src="C:/Users/fuaad/OneDrive/Desktop/js-class/folder/SpellCheckingExtension/src/Icons/add_to_dic.png" alt="add_to_dic" class="mr-2 size-10">' +
             '<button class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold px-2 px- rounded" id="replace">Add to Dictionary</button>' +
             '</span>' +
             '</div>' +
@@ -870,9 +881,11 @@ class HighlighterManager {
         let ul = suggestion_div.querySelector('.text-center');
         if (highlighterManager.#suggestedList.length > 0) {
             let num = 0;
-            highlighterManager.#suggestedList.forEach(suggestion => {
-                let li = document.createElement('li');
-                li.className = 'text-2xl hover:bg-sky-200 hover:transition-colors rounded-lg font-mono hover:text-slate-900';
+            console.log(highlighterManager.#suggestedList, "highlighterManager.#suggestedList")
+
+            highlighterManager.#suggestedList[name.ID].forEach(suggestion => {
+                let li = document.createElement('button');
+                li.className = 'text-2xl hover:bg-sky-200 hover:text-black-950   rounded-lg font-mono ';
                 li.id = `${num}`
                 li.textContent = suggestion;
                 ul.appendChild(li);
