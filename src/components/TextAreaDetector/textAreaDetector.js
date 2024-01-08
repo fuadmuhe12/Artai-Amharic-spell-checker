@@ -188,11 +188,28 @@ class EventDispatcher {
     }
 
     getChannelSubscribers(channelName) {
-        return this.channels[channelName].subscribers;
+        let channelFound = false;
+        let subscribers = [];
+
+        for (let element of this.channels) {
+            if (element.channelName === channelName) {
+                channelFound = true;
+                subscribers = element.subscribers;
+                break;
+            }
+        }
+
+        if (!channelFound) {
+            logger.warn(`No channel with name ${channelName}`);
+        }
+
+        return subscribers;
     }
 }
 
 const EventDispatcherObj = new EventDispatcher();
+
+
 
 //------------------------------//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // UserInterfaceManager class
@@ -243,36 +260,18 @@ class UserInterfaceManager {
                 break;
             case "GeezScript":
                 logger.info(
-                    "GeezScript is detected and spellcheck is activated: from userInterfaceManager class"
+                    "GeezScript is detected and spellcheck is activated demo data is about tobe sent: from userInterfaceManager class line:263"
                 );
                 // if GeezScript is detected, activate the spellcheck to send the text to the server
                 this.#GeezScript = event.DOM;
                 this.#GeezScript = true;
                 logger.info(
-                    `Text is about to be sent to the backgroung script for analysing`
+                    `Text is about to be sent(not now) to the backgroung script for analysing, line: 269` //FIXME: this is a demo data
                 );
 
-                let demo = {
-                    "text": "እኛ አለን እና ሰዎች ናቸው ። የሚሰሩ ሰዎች እና አሉ።",
-                    "errors": [
-                        {
-                            "word": "ናቸው",
-                            "suggestions": ['ሰዋች', 'ሳው', 'ስው']
-                        },
-                        {
-                            "word": "ሰዎች",
-                            "suggestions": ['ናችህው' ,'ንችህ', 'ናችህስ' ]
-                        }
-                        ,{
-                            "word": "ናቸው",
-                            "suggestions": ['ሰዋች', 'ሳው', 'ስው']
-                        },
-                    ]
-
-                }
-                logger.info(" demo message sending text to communication manager to scan the text: from userInterfaceManager class");
-                this.recieveMessageFromCommunicationManager(demo)
-                demo = ""
+                
+               
+                break;
         }
     }
     sendToCommunicationManager(text) {
@@ -289,6 +288,7 @@ class UserInterfaceManager {
     }
 
     recieveMessageFromCommunicationManager(result) {
+        logger.info(" text is recieved from communication manager after the scan , line: 291");
         let sentText = result.text;
         let receivedErrors = result.errors;
         this.#misspelledWordList.clear();
@@ -316,9 +316,12 @@ class UserInterfaceManager {
         };
         this.publishEvent(messageForMisspelled, "MisspelledWord")
         this.publishEvent(messageForSuggestion, "Suggestion")
+        result = ""
     }
+    
 
 }
+
 
 
 
@@ -329,7 +332,11 @@ class UserInterfaceManager {
 const userInterfaceManager = new UserInterfaceManager();
 
 userInterfaceManager.subscribeEvent("TextArea");
+
+
 userInterfaceManager.subscribeEvent("GeezScript");
+
+
 
 //---------------------------------------------//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //class for GeezScriptDetector
@@ -392,7 +399,7 @@ class GeezScriptDetector {
     publishEvent(channelName, payload) {
         if (channelName === "GeezScript") {
             this.eventDispatcher.publishEvent(channelName, payload);
-            logger.info(`Geez  published Event to channel ${channelName}`);
+            logger.info(`Geez class  published Event to channel ${channelName} , line: 419`);
         } else {
             logger.warn(`No channel with name ${channelName}`);
         }
@@ -890,8 +897,10 @@ class HighlighterManager {
                 li.id = `${num}`
                 li.dataset.wordPlace = `${name.word_ID}`
                 li.dataset.suggestionWord = "True"
+                li.dataset.suggestionPlace = `${name.ID}`;
                 li.textContent = suggestion;
                 ul.appendChild(li);
+
                 num += 1;
             });
         }
@@ -991,13 +1000,15 @@ class HighlighterManager {
 
     removehighlight(word, place, index) {
         // delete the wordlist from the set
-        logger.info(`removing the word ${word} from the misspelled word list: inside removehighlight function`)
+        logger.info(`removing the word ${word} and suggestion  from the misspelled word list: inside removehighlight function line:1003`)
+        this.#suggestedList.splice(index,1)
         this.#misspelledWordList.delete(word);
         const words = this.#textAreaList[0].value.split(/(\s+)/);
         words[place] = word;
         this.#textAreaList[0].value = words.join('');
         // remove the divs from the shadow root
-        this.#suggestedList =  this.#suggestedList.splice(index,1)
+        console.log(index, "index from suggestion---------------------------------- ")
+
         console.log(this.#suggestedList, "this.#suggestedList after removing the word in removehighlight function")
         this.highlight();
     }
@@ -1085,9 +1096,11 @@ class SuggestionsManager {
                 let place  = Number(event.target.dataset.wordPlace) 
                 let index = Number(event.target.dataset.suggestionPlace)
                 let word = event.target.textContent
-                highlighterManager.removehighlight(word,place, index)
-
                 suggestionsManager.#suggestionList.splice(index,1)
+                
+                highlighterManager.removehighlight(word,place, index)
+                console.log(index, "index from suggestion---------------------------------- ")
+                
                 console.log(suggestionsManager.#suggestionList, "suggestionsManager.#suggestionList after removing the word")
             }
         });
@@ -1143,3 +1156,30 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         userInterfaceManager.recieveMessageFromCommunicationManager(request.correctedText.result);
     }
 });
+console.log(EventDispatcherObj.channels, "channels--------------------------------------------------");
+console.log(EventDispatcherObj.getChannelSubscribers("Suggesion"), "sugetion channel subscribers--------------------------------------------------");
+console.log(EventDispatcherObj.getChannelSubscribers("MisspelledWord"), "MisspelledWord channel subscribers----------------------------------------");
+
+let demo = {
+    "text": "እኛ አለን እና ሰዎች ናቸው ። የሚሰሩ ሰዎች እና አሉ።",
+    "errors": [
+        {
+            "word": "ናቸው",
+            "suggestions": ['ሰዋች', 'ሳው', 'ስው']
+        },
+        {
+            "word": "ሰዎች",
+            "suggestions": ['ናችህው' ,'ንችህ', 'ናችህስ' ]
+        }
+        ,{
+            "word": "ናቸው",
+            "suggestions": ['ሰዋች', 'ሳው', 'ስው']
+        },
+    ]
+}
+logger.info(`demo: ${demo.errors}`)
+highlighterManager.textAreaList =textAreaDetector.textAreaList; // to be removed
+logger.info(" demo message sending text to communication manager for the scan from outer : line 354");
+userInterfaceManager.recieveMessageFromCommunicationManager(demo);
+
+
