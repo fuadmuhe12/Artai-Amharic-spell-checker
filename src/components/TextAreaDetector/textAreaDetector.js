@@ -272,6 +272,7 @@ class UserInterfaceManager {
                 }
                 logger.info(" demo message sending text to communication manager to scan the text: from userInterfaceManager class");
                 this.recieveMessageFromCommunicationManager(demo)
+                demo = ""
         }
     }
     sendToCommunicationManager(text) {
@@ -887,11 +888,14 @@ class HighlighterManager {
                 let li = document.createElement('button');
                 li.className = 'text-2xl hover:bg-sky-200 hover:text-black-950   rounded-lg font-mono ';
                 li.id = `${num}`
+                li.dataset.wordPlace = `${name.word_ID}`
+                li.dataset.suggestionWord = "True"
                 li.textContent = suggestion;
                 ul.appendChild(li);
                 num += 1;
             });
         }
+
         else {
             let li = document.createElement('li');
             li.className = 'text-2xl hover:bg-sky-200 hover:transition-colors rounded-lg font-mono hover:text-slate-900';
@@ -918,6 +922,7 @@ class HighlighterManager {
             isWord = true;
             suggestionsManager.displaySuggesion(name.ID);
             misspelled_word.style.backgroundColor = 'rgba(255, 0, 0, 0.2)';
+
         });
 
         misspelled_word.addEventListener('mouseleave', function () {
@@ -974,19 +979,26 @@ class HighlighterManager {
                     width: rect.width,
                     height: rect.height
                 });
-                id += 1 // to keep track each word or space location 
+                id += 1 // to keep track only misspelled words  
 
             }
-            word_ID += 1 // keep track of only misspelled words
+            word_ID += 1 // keep track of each word in the text area 
         });
 
         return metrics;
     }
     ////===========================================================================================================================================================================================================
 
-    removehighlight(word) {
+    removehighlight(word, place, index) {
         // delete the wordlist from the set
+        logger.info(`removing the word ${word} from the misspelled word list: inside removehighlight function`)
         this.#misspelledWordList.delete(word);
+        const words = this.#textAreaList[0].value.split(/(\s+)/);
+        words[place] = word;
+        this.#textAreaList[0].value = words.join('');
+        // remove the divs from the shadow root
+        this.#suggestedList =  this.#suggestedList.splice(index,1)
+        console.log(this.#suggestedList, "this.#suggestedList after removing the word in removehighlight function")
         this.highlight();
     }
     subscribeEvent(channel) {
@@ -1066,6 +1078,19 @@ class SuggestionsManager {
         logger.info("showsuggestin function is activated: inside showSuggestions function");
         const artai_suggestion = shadowRoot.getElementById(`artai_suggestion${num}`);
         artai_suggestion.style.display = 'block';
+        artai_suggestion.addEventListener('click', function (event) {
+            // if the click element has data-suggestionWord True replace the word with the suggestion
+            if(event.target.dataset.suggestionWord === "True"){
+                logger.info(`suggestion is selected by user and selected word : ${event.target.textContent}`)
+                let place  = Number(event.target.dataset.wordPlace) 
+                let index = Number(event.target.dataset.suggestionPlace)
+                let word = event.target.textContent
+                highlighterManager.removehighlight(word,place, index)
+
+                suggestionsManager.#suggestionList.splice(index,1)
+                console.log(suggestionsManager.#suggestionList, "suggestionsManager.#suggestionList after removing the word")
+            }
+        });
     }
 
      hideSuggesion(num) {
