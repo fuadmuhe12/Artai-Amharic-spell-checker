@@ -1,12 +1,16 @@
 //---------------------------------------------------------------------------------------------------------------------
 // logger class
 // Enum for log levels
+let dataSentOnce = false;
+// make the data sent once to be false every 3 seconds
+setInterval(() => {dataSentOnce = false}, 3000);
 const LogLevel = {
     Info: 1,
     Warn: 2,
     Error: 3,
     // Add more levels as needed
 };
+
 
 class Logger {
     constructor(options = {}) {
@@ -76,11 +80,7 @@ linkElem.setAttribute('href', "C:/Users/fuaad/OneDrive/Desktop/js-class/folder/S
 shadowRoot.appendChild(linkElem);
 //====================================//==========================================================================================================================================================================================================
 //adding a tailwind link to the shadow root
-logger.info("adding a tailwind link to the shadow root")
-let scriptElem = document.createElement('script');
-scriptElem.setAttribute('src', 'https://cdn.tailwindcss.com');
-shadowRoot.appendChild(scriptElem);
-//==========================================================================================================================================================================================================
+//=======================================================================================================================================================================
 console.log(shadowRoot, "shadowRoot");
 logger.info("shadow root is created");
 let div2 = document.createElement("div");
@@ -260,18 +260,28 @@ class UserInterfaceManager {
                 break;
             case "GeezScript":
                 logger.info(
-                    "GeezScript is detected and spellcheck is activated demo data is about tobe sent: from userInterfaceManager class line:263"
+                    "GeezScript is detected and spellcheck is activated and the  text data is about tobe sent: from userInterfaceManager class line:263"
                 );
+                // I want the data  to be sent only if  the sentdata is false
+                if(!dataSentOnce){
+                    console.log("sending the geez @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+
                 // if GeezScript is detected, activate the spellcheck to send the text to the server
                 this.#GeezScript = event.DOM;
                 this.#GeezScript = true;
-                logger.info(
-                    `Text is about to be sent(not now) to the backgroung script for analysing, line: 269` //FIXME: this is a demo data
-                );
-
                 
-               
-                break;
+                let textToBeSent = this.#textAreaList[0].value; // for scanning
+
+                this.sendToCommunicationManager(textToBeSent);
+                // send the text to the server for scanning
+                dataSentOnce = true;
+               }
+               else{
+                console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&  no sending of data")
+                console.log(dataSentOnce, "the data send ??????????????????????????????????")
+                logger.warn("data already sent for scanning line : 278 ")
+               }
+               break;
         }
     }
     sendToCommunicationManager(text) {
@@ -279,11 +289,24 @@ class UserInterfaceManager {
             type: "textforScanning",
             data: text,
         };
-        logger.info("sending text to communication manager to scan the text");
+
+        
+        logger.info("sending text to communication manager found in background script to scan the text");
         chrome.runtime.sendMessage(message, function (response) {
             logger.info(
-                `recieved response from communication manager: ${response.result}`
-            );
+                `reponse from background script fro recieving text for analysis : ${response.result} , : inside sendToCommunicationManager function line :284`
+            );  
+        });
+        chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+            console.log(message, "message from background script to userInterfaceManager line 287");
+            if (message.type === "correctedText") {
+                sendResponse({ result: "Corrected succesfully text recieved by content script" });
+                // send to the user interface manager
+                // TODO: send the recieved data to the correct place
+                logger.info("recieved corrected text from the background script and sending to userINterface: line 1158");
+                
+                userInterfaceManager.recieveMessageFromCommunicationManager(message.correctedText.result);
+            }
         });
     }
 
@@ -291,6 +314,8 @@ class UserInterfaceManager {
         logger.info(" text is recieved from communication manager after the scan , line: 291");
         let sentText = result.text;
         let receivedErrors = result.errors;
+        console.log(result, "result from userInterfaceManager class line: 293")
+        console.log(receivedErrors, "receivedErrors from userInterfaceManager class line: 303")
         this.#misspelledWordList.clear();
         this.#suggestedList = []
 
@@ -399,7 +424,7 @@ class GeezScriptDetector {
     publishEvent(channelName, payload) {
         if (channelName === "GeezScript") {
             this.eventDispatcher.publishEvent(channelName, payload);
-            logger.info(`Geez class  published Event to channel ${channelName} , line: 419`);
+            logger.info(`Geez class  is publishing Event to channel ${channelName} saying geezFound , line: 404`);
         } else {
             logger.warn(`No channel with name ${channelName}`);
         }
@@ -413,7 +438,7 @@ class GeezScriptDetector {
                 const text = textArea1.value;
                 this.#isGeezScript = this.isGeezScript(text);
                 if (this.#isGeezScript) {
-                    logger.info("Amharic Geez script detected");
+                    logger.info("Amharic Geez script detected from handle event of GeezScriptDetector class line: 418");
                     this.publishEvent("GeezScript", {
                         type: "GeezScript",
                         DOM: this.#textAreaList[0],
@@ -448,7 +473,7 @@ class TextAreaDetector {
             if (this.textAreaList.length > 0) {
                 //=================================================================================================================================================================================================================
                 let textArea = this.textAreaList[0];
-                textArea.value = "እኛ አለን እና ሰዎች ናቸው ። የሚሰሩ ሰዎች እና አሉ።";
+                textArea.value = "እኛ አለን እና ሰዎች ናቸው ። ድቭድፍቭ ሰዎች እና አሉ።";
                 let textAreaPos = textArea.getBoundingClientRect()
                 logger.info("creating the shadow root for text area: inside TextAreaDetector function");
                 let div3 = document.createElement("div");
@@ -748,17 +773,18 @@ class HighlighterManager {
             logger.info(
                 "divs for misspelled store created: inside highlight function: next is problem place!!!"
             );
-
-
-
-
-
-
-
-
             logger.info("creating the divs: for mirrowr : inside highlight function");
-            var diq = document.createElement("div");
+            let diq = document.createElement("div");
+            diq.id = "diq";
+            // if diq is not in the body add it
+            
             diq.style = "position: absolute; opacity: 0; pointer-events: none; z-index: -9999; top: 0px; left: 0px; "
+            document.querySelectorAll("#diq").forEach(function (thDiv, index) {
+                thDiv.remove();
+                if (index < document.querySelectorAll("#diq").length - 1) {
+                    diq.remove();
+                }
+            })
             document.body.appendChild(diq);
             logger.info("start of change function: inside highlight function");
             //===========================================================================================================================================================================================================
@@ -777,6 +803,7 @@ class HighlighterManager {
 
 
                 console.log(getCaretCoordinates(text_Area, text_Area.selectionStart).div, "the mirro sfvsfdvsfdv r")
+                text_Area= highlighterManager.#textAreaList[0];
                 let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart).div
                 console.log(mirror, "the mirror")
                 if (diq.textContent !== mirror.textContent) {
@@ -890,8 +917,9 @@ class HighlighterManager {
         if (highlighterManager.#suggestedList.length > 0) {
             let num = 0;
             console.log(highlighterManager.#suggestedList, "highlighterManager.#suggestedList")
-
-            highlighterManager.#suggestedList[name.ID].forEach(suggestion => {
+            
+            if (highlighterManager.#suggestedList[name.ID].length > 0) {
+            highlighterManager.#suggestedList[name.ID].forEach((suggestion) => {
                 let li = document.createElement('button');
                 li.className = 'text-2xl hover:bg-sky-200 hover:text-black-950   rounded-lg font-mono ';
                 li.id = `${num}`
@@ -902,16 +930,19 @@ class HighlighterManager {
                 ul.appendChild(li);
 
                 num += 1;
-            });
+            });}
+            else{
+                //no suugestion 
+                let li = document.createElement('li');
+                li.className = 'text-2xl hover:bg-sky-200 hover:text-black-950   rounded-lg font-mono ';
+                li.textContent = "No suggestion";
+                ul.appendChild(li);
+                
+            }
+            
         }
 
-        else {
-            let li = document.createElement('li');
-            li.className = 'text-2xl hover:bg-sky-200 hover:transition-colors rounded-lg font-mono hover:text-slate-900';
-            li.textContent = "No suggestion";
-            ul.appendChild(li);
-
-        }
+        
         if (
             shadowRoot.querySelector(`#artai_suggestion${name.ID}`) === null
         ) {
@@ -1001,7 +1032,12 @@ class HighlighterManager {
     removehighlight(word, place, index) {
         // delete the wordlist from the set
         logger.info(`removing the word ${word} and suggestion  from the misspelled word list: inside removehighlight function line:1003`)
-        this.#suggestedList.splice(index,1)
+        logger.info(`suggestedList before removing ${this.#suggestedList} : inside removehighlight function line:1004`)
+        console.log(this.#suggestedList,`suggestion before removing --------------------------- inside hightligt`)
+        this.#suggestedList.splice(index,1) // remove the suggestion from the list
+        console.log(this.#suggestedList, "after removing the suggestion-------------------------------- inside highlight")
+        logger.info(`suggestedList after removing ${this.#suggestedList} : inside removehighlight function line:1006`)
+        
         this.#misspelledWordList.delete(word);
         const words = this.#textAreaList[0].value.split(/(\s+)/);
         words[place] = word;
@@ -1009,7 +1045,6 @@ class HighlighterManager {
         // remove the divs from the shadow root
         console.log(index, "index from suggestion---------------------------------- ")
 
-        console.log(this.#suggestedList, "this.#suggestedList after removing the word in removehighlight function")
         this.highlight();
     }
     subscribeEvent(channel) {
@@ -1057,32 +1092,29 @@ class SuggestionsManager {
 
     showSuggestions() {
         logger.info("suggesion manager is activated: now inside showSuggestions function");
-        if (this.#suggestionList.length > 0) {
-            logger.info("adding  listener to the shadow root: inside showSuggestions function");
+        // if (this.#suggestionList.length > 0) {
+        //     logger.info("adding  listener to the shadow root: inside showSuggestions function");
 
-            // Get all elements with class 'misspleledWord'
-            const misspelledWordsForsuggesion = shadowRoot.querySelectorAll('[data-misspelled="misspelled"]');;
-            console.log(misspelledWordsForsuggesion, "misspelledWordsForsuggesion from suggestion manager")
-            // Add event listeners to each 'misspleledWord' element
-            for (let index = 0; index < misspelledWordsForsuggesion.length; index++) {
-                shadowRoot.getElementById(`#artai_misspelled_word${index}`).addEventListener('mouseover', function () {
-                    suggestionsManager.displaySuggesion(index);
-                    console.log(misspleledWord,index, "index")
-                    //  add event to the parent of the event 
+        //     // Get all elements with class 'misspleledWord'
+        //     const misspelledWordsForsuggesion = shadowRoot.querySelectorAll('[data-misspelled="misspelled"]');;
+        //     console.log(misspelledWordsForsuggesion, "misspelledWordsForsuggesion from suggestion manager")
+        //     // Add event listeners to each 'misspleledWord' element
+        //     for (let index = 0; index < misspelledWordsForsuggesion.length; index++) {
+        //         shadowRoot.getElementById(`#artai_misspelled_word${index}`).addEventListener('mouseover', function () {
+        //             suggestionsManager.displaySuggesion(index);
+        //             console.log(misspleledWord,index, "index")
+        //             //  add event to the parent of the event 
 
-                });
-                //  add event to the parent of the event 
-                shadowRoot.getElementById(`#artai_misspelled_word${index}`).parentElement.addEventListener('mouseout', function () {
-                    suggestionsManager.hideSuggesion(index)
-                })
-            };
-
-
-            
-        }
-        else {
-            logger.warn("No suggestion to show")
-        }
+        //         });
+        //         //  add event to the parent of the event 
+        //         shadowRoot.getElementById(`#artai_misspelled_word${index}`).parentElement.addEventListener('mouseout', function () {
+        //             suggestionsManager.hideSuggesion(index)
+        //         })
+        //     };
+        // }
+        // else {
+        //     logger.warn("No suggestion to show")
+        // }
 
     }
      displaySuggesion(num) {
@@ -1096,10 +1128,11 @@ class SuggestionsManager {
                 let place  = Number(event.target.dataset.wordPlace) 
                 let index = Number(event.target.dataset.suggestionPlace)
                 let word = event.target.textContent
-                suggestionsManager.#suggestionList.splice(index,1)
+                console.log(suggestionsManager.#suggestionList, "before removing suggestion ################### inside suggestion manger")
+                //suggestionsManager.#suggestionList.splice(index,1)
                 
                 highlighterManager.removehighlight(word,place, index)
-                console.log(index, "index from suggestion---------------------------------- ")
+                console.log(suggestionsManager.#suggestionList, "index from suggestion#################################3   inside suggestion manager- ")
                 
                 console.log(suggestionsManager.#suggestionList, "suggestionsManager.#suggestionList after removing the word")
             }
@@ -1136,6 +1169,8 @@ suggestionsManager.subscribeEvent("Suggestion");
 
 // sending log messages to the background script
 // Send a message to the background script every 1 minute
+
+
 setInterval(function () {
     chrome.runtime.sendMessage(
         { type: "sendLogger", logger: logger.getLogMessages() },
@@ -1148,38 +1183,11 @@ setInterval(function () {
 }, 10000);
 
 // --------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.type === "correctedText") {
-        // send to the user interface manager
-        // TODO: send the recieved data to the correct place
-        logger.info("recieved corrected text from the server");
-        userInterfaceManager.recieveMessageFromCommunicationManager(request.correctedText.result);
-    }
-});
+
 console.log(EventDispatcherObj.channels, "channels--------------------------------------------------");
 console.log(EventDispatcherObj.getChannelSubscribers("Suggesion"), "sugetion channel subscribers--------------------------------------------------");
 console.log(EventDispatcherObj.getChannelSubscribers("MisspelledWord"), "MisspelledWord channel subscribers----------------------------------------");
 
-let demo = {
-    "text": "እኛ አለን እና ሰዎች ናቸው ። የሚሰሩ ሰዎች እና አሉ።",
-    "errors": [
-        {
-            "word": "ናቸው",
-            "suggestions": ['ሰዋች', 'ሳው', 'ስው']
-        },
-        {
-            "word": "ሰዎች",
-            "suggestions": ['ናችህው' ,'ንችህ', 'ናችህስ' ]
-        }
-        ,{
-            "word": "ናቸው",
-            "suggestions": ['ሰዋች', 'ሳው', 'ስው']
-        },
-    ]
-}
-logger.info(`demo: ${demo.errors}`)
-highlighterManager.textAreaList =textAreaDetector.textAreaList; // to be removed
-logger.info(" demo message sending text to communication manager for the scan from outer : line 354");
-userInterfaceManager.recieveMessageFromCommunicationManager(demo);
+
 
 
