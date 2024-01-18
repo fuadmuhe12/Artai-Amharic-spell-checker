@@ -3,7 +3,7 @@
 // Enum for log levels
 let dataSentOnce = false;
 // make the data sent once to be false every 3 seconds
-setInterval(() => {dataSentOnce = false}, 3000);
+setInterval(() => { dataSentOnce = false }, 3000);
 const LogLevel = {
     Info: 1,
     Warn: 2,
@@ -20,8 +20,8 @@ class Logger {
 
     log(message, level = LogLevel.Info) {
         if (level >= this.level) {
-            const formattedMessage = this.formatMessage(message, level);
-            this.logMessages.push(formattedMessage); // Store the message in the array
+            // const formattedMessage = this.formatMessage(message, level);
+            // this.logMessages.push(formattedMessage); // Store the message in the array
         }
     }
 
@@ -76,7 +76,7 @@ const shadowRoot = element.shadowRoot;
 logger.info("adding a css file to the shadow root")
 let linkElem = document.createElement('link');
 linkElem.setAttribute('rel', 'stylesheet');
-linkElem.setAttribute('href', "C:/Users/fuaad/OneDrive/Desktop/js-class/folder/SpellCheckingExtension/src/styles/style.css");
+linkElem.setAttribute('href', 'Spell-Checking-Extension/src/styles/style.css');
 shadowRoot.appendChild(linkElem);
 //====================================//==========================================================================================================================================================================================================
 //adding a tailwind link to the shadow root
@@ -247,41 +247,35 @@ class UserInterfaceManager {
                 this.#spellcheckStatus = true;
                 // inject an image icon into the parent of text area
                 const parent = textArea1.parentElement;
-                
 
-                
-              
 
-                
+
+
+
+
                 console.log(div, "div");
                 parent.appendChild(div);
                 console.log(parent, "parent");
 
                 break;
             case "GeezScript":
-                logger.info(
-                    "GeezScript is detected and spellcheck is activated and the  text data is about tobe sent: from userInterfaceManager class line:263"
-                );
+                logger.info(`UIM recieded GeezScript , ready to send the text to the server for scanning : UMI line 262`);
                 // I want the data  to be sent only if  the sentdata is false
-                if(!dataSentOnce){
-                    console.log("sending the geez @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+
+                console.log("sending the geez @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",this.#textAreaList[0].value) 
 
                 // if GeezScript is detected, activate the spellcheck to send the text to the server
                 this.#GeezScript = event.DOM;
                 this.#GeezScript = true;
-                
+
+
                 let textToBeSent = this.#textAreaList[0].value; // for scanning
 
                 this.sendToCommunicationManager(textToBeSent);
                 // send the text to the server for scanning
                 dataSentOnce = true;
-               }
-               else{
-                console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&  no sending of data")
-                console.log(dataSentOnce, "the data send ??????????????????????????????????")
-                logger.warn("data already sent for scanning line : 278 ")
-               }
-               break;
+
+                break;
         }
     }
     sendToCommunicationManager(text) {
@@ -290,32 +284,30 @@ class UserInterfaceManager {
             data: text,
         };
 
-        
-        logger.info("sending text to communication manager found in background script to scan the text");
+
+        logger.info("sending text to communication manager found in background script to scan the text:  UIM/ sendToCommunicationManager function line 288");
         chrome.runtime.sendMessage(message, function (response) {
             logger.info(
-                `reponse from background script fro recieving text for analysis : ${response.result} , : inside sendToCommunicationManager function line :284`
-            );  
+                `reponse from background script from recieving text for analysis : ${response.result} , : UIM/ sendToCommunicationManager function line 291`
+            );
         });
         chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-            console.log(message, "message from background script to userInterfaceManager line 287");
             if (message.type === "correctedText") {
-                sendResponse({ result: "Corrected succesfully text recieved by content script" });
+                sendResponse({ result: "Corrected text succesfully  recieved by content script :UIM " });
                 // send to the user interface manager
                 // TODO: send the recieved data to the correct place
-                logger.info("recieved corrected text from the background script and sending to userINterface: line 1158");
-                
+                logger.info("corrected text is recieved by content script from background script: UIM/sendToCommunicationManager line 299");
+
                 userInterfaceManager.recieveMessageFromCommunicationManager(message.correctedText.result);
             }
         });
     }
 
     recieveMessageFromCommunicationManager(result) {
-        logger.info(" text is recieved from communication manager after the scan , line: 291");
+        logger.info("publishing recieved data from background script: UIM/recieveMessageFromCommunicationManager line 307  ");
+        console.log(result, "-------------------result from UIM class line: 308")
         let sentText = result.text;
         let receivedErrors = result.errors;
-        console.log(result, "result from userInterfaceManager class line: 293")
-        console.log(receivedErrors, "receivedErrors from userInterfaceManager class line: 303")
         this.#misspelledWordList.clear();
         this.#suggestedList = []
 
@@ -331,7 +323,7 @@ class UserInterfaceManager {
             misspelledData: this.#misspelledWordList,
             suggestionData: this.#suggestedList
         };// this to be highlited 
-        console.log(messageForMisspelled, "messageForMisspelled to check order of the words")
+
 
         let messageForSuggestion = {
             //for to be decided
@@ -343,7 +335,7 @@ class UserInterfaceManager {
         this.publishEvent(messageForSuggestion, "Suggestion")
         result = ""
     }
-    
+
 
 }
 
@@ -482,7 +474,7 @@ class TextAreaDetector {
                 logo.setAttribute("src", "https://cdn.icon-icons.com/icons2/2645/PNG/512/textarea_t_text_icon_159809.png");
                 logo.setAttribute("id", "spellcheck-icon");
                 logo.setAttribute("title", "Artie Amharic Spellcheck");
-                logo.setAttribute("style", `width: 20px; height: 20px; margin-left: 5px; cursor: pointer; position: absolute; top: ${textAreaPos.top +textAreaPos.height -30 }px; left: ${textAreaPos.left + textAreaPos.width -33}px; `);
+                logo.setAttribute("style", `width: 20px; height: 20px; margin-left: 5px; cursor: pointer; position: absolute; top: ${textAreaPos.top + textAreaPos.height - 30}px; left: ${textAreaPos.left + textAreaPos.width - 33}px; `);
                 shadowRoot.appendChild(logo);
 
                 logo.addEventListener("mouseover", function () {
@@ -496,10 +488,10 @@ class TextAreaDetector {
                 logo.addEventListener("mouseout", function () {
                     //remove the hover effect and scale down
                     logo.style.transform = "scale(1)";
-                    
+
                     logo.style.backgroundColor = "";
                 });
-               
+
 
 
                 div3.style = ` top: ${textAreaPos.top}px; left: ${textAreaPos.left}px; width: ${textAreaPos.width}px; height: ${textAreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
@@ -777,7 +769,7 @@ class HighlighterManager {
             let diq = document.createElement("div");
             diq.id = "diq";
             // if diq is not in the body add it
-            
+
             diq.style = "position: absolute; opacity: 0; pointer-events: none; z-index: -9999; top: 0px; left: 0px; "
             document.querySelectorAll("#diq").forEach(function (thDiv, index) {
                 thDiv.remove();
@@ -792,7 +784,6 @@ class HighlighterManager {
 
             function change() {
                 text_AreaPos = text_Area.getBoundingClientRect();
-                console.log(text_AreaPos, "text area posotion from highlight function")
                 highlighterManager.element3.style = `top: ${text_AreaPos.top}px; left: ${text_AreaPos.left}px; width: ${text_AreaPos.width}px; height: ${text_AreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
 
                 highlighterManager.element4.innerHTML = ""
@@ -802,10 +793,8 @@ class HighlighterManager {
 
 
 
-                console.log(getCaretCoordinates(text_Area, text_Area.selectionStart).div, "the mirro sfvsfdvsfdv r")
-                text_Area= highlighterManager.#textAreaList[0];
+                text_Area = highlighterManager.#textAreaList[0];
                 let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart).div
-                console.log(mirror, "the mirror")
                 if (diq.textContent !== mirror.textContent) {
                     diq.textContent = mirror.textContent;
                 }
@@ -815,7 +804,6 @@ class HighlighterManager {
                     diq.style[property] = mirror.style[property];
                 }
 
-                console.log(diq, "the diq")
                 const vals = highlighterManager.getTextNodeMetrics(diq, misspelled_words)// get the position of each word in the text area
                 console.log(vals, "vals")
                 for (let word = 0; word < vals.length; word++) {
@@ -889,7 +877,7 @@ class HighlighterManager {
 
         let suggestion_div = document.createElement("div");
         // show the suggestion in absolute position below the word, without any space separation between the two
-        suggestion_div.style = `position:fixed; top: ${name.top + name.height+10}px; left: ${name.left - 10}px; `
+        suggestion_div.style = `position:fixed; top: ${name.top + name.height + 10}px; left: ${name.left - 10}px; `
         suggestion_div.style.display = "none";
         suggestion_div.style.zIndex = "99999";
         suggestion_div.dataset.suggestion = 'suggestion'
@@ -903,8 +891,8 @@ class HighlighterManager {
             '<div class="flex flex-col gap-5 justify-between items-start mt-6">' +
             '<div class="flex ">' +
             '<span class="flex" id="add_to_dic">' +
-            '<img src="C:/Users/fuaad/OneDrive/Desktop/js-class/folder/SpellCheckingExtension/src/Icons/add_to_dic.png" alt="add_to_dic" class="mr-2 size-10">' +
-            '<button class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold px-2 px- rounded" id="replace">Add to Dictionary</button>' +
+            '<img src="Spell-Checking-Extension/src/Icons/add_to_dic.png" alt="add_to_dic" class="mr-2 size-10">' +
+            '<button class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold px-2 px- rounded" id="addToDic" >Add to Dictionary</button>' +
             '</span>' +
             '</div>' +
             '<div class="mx-auto my-3 ">' +
@@ -912,37 +900,38 @@ class HighlighterManager {
             '</div>' +
             '</div>' +
             '</div>';
-            suggestion_div.style.pointerEvents = "auto";
+        suggestion_div.style.pointerEvents = "auto";
         let ul = suggestion_div.querySelector('.text-center');
         if (highlighterManager.#suggestedList.length > 0) {
             let num = 0;
             console.log(highlighterManager.#suggestedList, "highlighterManager.#suggestedList")
-            
-            if (highlighterManager.#suggestedList[name.ID].length > 0) {
-            highlighterManager.#suggestedList[name.ID].forEach((suggestion) => {
-                let li = document.createElement('button');
-                li.className = 'text-2xl hover:bg-sky-200 hover:text-black-950   rounded-lg font-mono ';
-                li.id = `${num}`
-                li.dataset.wordPlace = `${name.word_ID}`
-                li.dataset.suggestionWord = "True"
-                li.dataset.suggestionPlace = `${name.ID}`;
-                li.textContent = suggestion;
-                ul.appendChild(li);
 
-                num += 1;
-            });}
-            else{
+            if (highlighterManager.#suggestedList[name.ID].length > 0) {
+                highlighterManager.#suggestedList[name.ID].forEach((suggestion) => {
+                    let li = document.createElement('button');
+                    li.className = 'text-2xl hover:bg-sky-200 hover:text-black-950   rounded-lg font-mono ';
+                    li.id = `${num}`
+                    li.dataset.wordPlace = `${name.word_ID}`
+                    li.dataset.suggestionWord = "True"
+                    li.dataset.suggestionPlace = `${name.ID}`;
+                    li.textContent = suggestion;
+                    ul.appendChild(li);
+
+                    num += 1;
+                });
+            }
+            else {
                 //no suugestion 
                 let li = document.createElement('li');
                 li.className = 'text-2xl hover:bg-sky-200 hover:text-black-950   rounded-lg font-mono ';
                 li.textContent = "No suggestion";
                 ul.appendChild(li);
-                
+
             }
-            
+
         }
 
-        
+
         if (
             shadowRoot.querySelector(`#artai_suggestion${name.ID}`) === null
         ) {
@@ -967,12 +956,13 @@ class HighlighterManager {
 
         misspelled_word.addEventListener('mouseleave', function () {
             isWord = false;
-                setTimeout(function () {
+            setTimeout(function () {
                 if (!isWord && !issuggestion) {
                     misspelled_word.style.backgroundColor = '';
                     suggestionsManager.hideSuggesion(name.ID);
-                }}, 100);
-            }
+                }
+            }, 100);
+        }
         );
 
         suggestion_div.addEventListener('mouseenter', function () {
@@ -981,12 +971,13 @@ class HighlighterManager {
 
         suggestion_div.addEventListener('mouseleave', function () {
             issuggestion = false;
-                setTimeout(function () {
+            setTimeout(function () {
                 if (!isWord && !issuggestion) {
                     misspelled_word.style.backgroundColor = '';
                     suggestionsManager.hideSuggesion(name.ID);
-                }},100);
-            
+                }
+            }, 100);
+
         });
 
     }
@@ -1033,11 +1024,11 @@ class HighlighterManager {
         // delete the wordlist from the set
         logger.info(`removing the word ${word} and suggestion  from the misspelled word list: inside removehighlight function line:1003`)
         logger.info(`suggestedList before removing ${this.#suggestedList} : inside removehighlight function line:1004`)
-        console.log(this.#suggestedList,`suggestion before removing --------------------------- inside hightligt`)
-        this.#suggestedList.splice(index,1) // remove the suggestion from the list
+        console.log(this.#suggestedList, `suggestion before removing --------------------------- inside hightligt`)
+        this.#suggestedList.splice(index, 1) // remove the suggestion from the list
         console.log(this.#suggestedList, "after removing the suggestion-------------------------------- inside highlight")
         logger.info(`suggestedList after removing ${this.#suggestedList} : inside removehighlight function line:1006`)
-        
+
         this.#misspelledWordList.delete(word);
         const words = this.#textAreaList[0].value.split(/(\s+)/);
         words[place] = word;
@@ -1117,29 +1108,42 @@ class SuggestionsManager {
         // }
 
     }
-     displaySuggesion(num) {
+    displaySuggesion(num) {
         logger.info("showsuggestin function is activated: inside showSuggestions function");
         const artai_suggestion = shadowRoot.getElementById(`artai_suggestion${num}`);
         artai_suggestion.style.display = 'block';
         artai_suggestion.addEventListener('click', function (event) {
             // if the click element has data-suggestionWord True replace the word with the suggestion
-            if(event.target.dataset.suggestionWord === "True"){
+            if (event.target.dataset.suggestionWord === "True") {
                 logger.info(`suggestion is selected by user and selected word : ${event.target.textContent}`)
-                let place  = Number(event.target.dataset.wordPlace) 
+                let place = Number(event.target.dataset.wordPlace)
                 let index = Number(event.target.dataset.suggestionPlace)
                 let word = event.target.textContent
                 console.log(suggestionsManager.#suggestionList, "before removing suggestion ################### inside suggestion manger")
                 //suggestionsManager.#suggestionList.splice(index,1)
-                
-                highlighterManager.removehighlight(word,place, index)
+
+                highlighterManager.removehighlight(word, place, index)
                 console.log(suggestionsManager.#suggestionList, "index from suggestion#################################3   inside suggestion manager- ")
-                
+
                 console.log(suggestionsManager.#suggestionList, "suggestionsManager.#suggestionList after removing the word")
             }
+            else if (event.target.id === "addToDic") {
+                logger.info(`the word ${event.target.dataset.word} is added to the dictionary`)
+                let wordToAdd = textAreaDetector.textAreaList[0].value[event.target.dataset.wordPlace]
+                let messageToAddToDic = {
+                    type: "addToDic",
+                    data: wordToAdd
+                }
+                chrome.runtime.sendMessage(messageToAddToDic, function (response) {
+                    logger.info(`response from the backgound script for reciving add to dictionary: ${response.result}`);
+                })
+            }
+
+
         });
     }
 
-     hideSuggesion(num) {
+    hideSuggesion(num) {
         logger.info("hidesuggestin function is activated: inside showSuggestions function");
         const artai_suggestion = shadowRoot.getElementById(`artai_suggestion${num}`);
         artai_suggestion.style.display = 'none';

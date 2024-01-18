@@ -53,15 +53,38 @@ backgroundLogger.log("background script loaded");
 //-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 // class of spellcheckAPIManager
 class SpellcheckAPIManager {
+    // http://localhost:4000/check?
     sentData; //to the Engine
     recievedData; // from the  Engine
     sendRequestToEngine(text) {
+        backgroundLogger.info("sending text for scan to the engine : API")
+        let dataToSend = {
+            text: text
+        }
+        fetch(`http://localhost:4000/check?text=${text}`, {
+            method:"GET"
+        })
+        .then(response => response.json())
+        .then(resultData => { 
+            console.log(resultData)
+            console.log(resultData.success, "cheking succes")
+            if (resultData.success){
+                backgroundLogger.log("succesfully recieved data from the Engine")
+                this.returnResult(resultData)
+            }
+            else{
+                backgroundLogger.log("failed to recieve data from the Engine")
+            }
+            
+
+        })
         //send text to the Engine
-        // TODO: implement this function
     }
-    recieveresposeFromEngine() {
+    returnResult(result) {
+        backgroundLogger.info("sending scan result to communication manager : API")
+        spellcheckCommunicationManager.sendCorrectedText(result)
         //recieve text from the Engine
-        // TODO: implement this function
+        
     }
 }
 const spellcheckAPIManager = new SpellcheckAPIManager();
@@ -71,22 +94,24 @@ const spellcheckAPIManager = new SpellcheckAPIManager();
 class SpellcheckCommunicationManager {
     textForScanning;
     correctedText;
-    spellcheckAPIManager = spellcheckAPIManager; // TODO: implement this class
+    spellcheckAPIManager = spellcheckAPIManager; 
     sendTextforScanning(text) {
+        backgroundLogger.info("sending text to the API manager for the scan")
+        spellcheckAPIManager.sendRequestToEngine(text)
         // send text to the spellcheckAPIManager
-        // TODO: implement this function
+        
     }
-    recieveCorrectedText() {
-        // recieve text from the spellcheckAPIManager
-        // TODO: implement this function
-    }
-    sendCorrectedText() {
+ 
+    sendCorrectedText(resultData) {
         backgroundLogger.log("sending corrected text to content script");
         // send text to the content script
         let messageToContentScript = {
             type: "correctedText",
-            correctedText: {
-                result: {
+            correctedText: resultData
+        }; // demo data
+        /* {
+              result: 
+            
                     text: "እኛ አለን እና ሰዎች ናቸው ። ድቭድፍቭ ሰዎች እና አሉ።",
                     errors: [
                         {
@@ -108,8 +133,8 @@ class SpellcheckCommunicationManager {
                         
                     ],
                 },
-            },
-        }; // demo data
+            }
+        */
         console.log(`sending message to content script: ${messageToContentScript}`);
 
         chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
@@ -132,6 +157,49 @@ class SpellcheckCommunicationManager {
 const spellcheckCommunicationManager = new SpellcheckCommunicationManager();
 
 //----//-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
+//----//-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
+//dictionary class for user prefrence 
+class DictionaryManager{
+    dictionaryWords = new Set();
+    addTodic(text){
+        dictionaryWords.add(text);
+        this.savetoStorage();
+    }
+    removeFromDic(text){
+        this.dictionaryWords.delete(text);
+    }
+    getDic(){
+        return this.dictionaryWords;
+    }
+    clearDic(){
+        this.dictionaryWords.clear();
+    }
+    isInDic(text){
+        return this.dictionaryWords.has(text);
+    }
+    savetoStorage(){
+        chrome.storage.sync.set({ defaultDictionary: this.dictionaryWords }).then(() => {
+            backgroundLogger.log("data saved to storage");
+          });
+    }
+    loadfromStorage(){
+        chrome.storage.sync.get(["defaultDictionary"], (result) => {
+            backgroundLogger.log("dictionary loaded from storage");
+            this.dictionaryWords = result.defaultDictionary;
+          });
+    }
+}
+
+const dictionaryManager = new DictionaryManager();
+
+if (chrome.storage.get("defaultDictionary") != null){
+    dictionaryManager.loadfromStorage();
+}
+
+//save to storage when the tab curent tab  is about to close
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+    dictionaryManager.savetoStorage();
+});  
 
 //-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 let contentLogger = "Logger from content script not received yet";
@@ -152,11 +220,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             result: `succesfully received text ${text} from content script: from background script `,
         });
 
-        spellcheckCommunicationManager.sendCorrectedText();
-
-        
-        
+        spellcheckCommunicationManager.sendTextforScanning(text);
     }
+    else if (request.type === "addToDic") {
+        backgroundLogger.log("word added to dictionary");
+        let word = request.data;
+        dictionaryManager.addTodic(word);
+    } 
 });
 
 console.log("background script loaded");
