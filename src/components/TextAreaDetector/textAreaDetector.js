@@ -20,8 +20,8 @@ class Logger {
 
     log(message, level = LogLevel.Info) {
         if (level >= this.level) {
-            // const formattedMessage = this.formatMessage(message, level);
-            // this.logMessages.push(formattedMessage); // Store the message in the array
+            const formattedMessage = this.formatMessage(message, level);
+            this.logMessages.push(formattedMessage); // Store the message in the array
         }
     }
 
@@ -259,7 +259,7 @@ class UserInterfaceManager {
 
                 break;
             case "GeezScript":
-                logger.info(`UIM recieded GeezScript , ready to send the text to the server for scanning : UMI line 262`);
+                logger.info( `UIM recieded GeezScript , ready to send the text to the server for scanning : UMI line 262`);
                 // I want the data  to be sent only if  the sentdata is false
 
                 console.log("sending the geez @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",this.#textAreaList[0].value) 
@@ -305,7 +305,7 @@ class UserInterfaceManager {
 
     recieveMessageFromCommunicationManager(result) {
         logger.info("publishing recieved data from background script: UIM/recieveMessageFromCommunicationManager line 307  ");
-        console.log(result, "-------------------result from UIM class line: 308")
+        console.log(result, "result from UIM class line: 308")
         let sentText = result.text;
         let receivedErrors = result.errors;
         this.#misspelledWordList.clear();
@@ -784,6 +784,7 @@ class HighlighterManager {
 
             function change() {
                 text_AreaPos = text_Area.getBoundingClientRect();
+                console.log(text_AreaPos, "text area posotion from highlight function")
                 highlighterManager.element3.style = `top: ${text_AreaPos.top}px; left: ${text_AreaPos.left}px; width: ${text_AreaPos.width}px; height: ${text_AreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
 
                 highlighterManager.element4.innerHTML = ""
@@ -793,8 +794,10 @@ class HighlighterManager {
 
 
 
+                console.log(getCaretCoordinates(text_Area, text_Area.selectionStart).div, "the mirro sfvsfdvsfdv r")
                 text_Area = highlighterManager.#textAreaList[0];
                 let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart).div
+                console.log(mirror, "the mirror")
                 if (diq.textContent !== mirror.textContent) {
                     diq.textContent = mirror.textContent;
                 }
@@ -804,6 +807,7 @@ class HighlighterManager {
                     diq.style[property] = mirror.style[property];
                 }
 
+                console.log(diq, "the diq")
                 const vals = highlighterManager.getTextNodeMetrics(diq, misspelled_words)// get the position of each word in the text area
                 console.log(vals, "vals")
                 for (let word = 0; word < vals.length; word++) {
@@ -892,7 +896,7 @@ class HighlighterManager {
             '<div class="flex ">' +
             '<span class="flex" id="add_to_dic">' +
             '<img src="Spell-Checking-Extension/src/Icons/add_to_dic.png" alt="add_to_dic" class="mr-2 size-10">' +
-            '<button class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold px-2 px- rounded" id="addToDic" >Add to Dictionary</button>' +
+            '<button class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold px-2 px- rounded" id="replace">Add to Dictionary</button>' +
             '</span>' +
             '</div>' +
             '<div class="mx-auto my-3 ">' +
@@ -1127,19 +1131,6 @@ class SuggestionsManager {
 
                 console.log(suggestionsManager.#suggestionList, "suggestionsManager.#suggestionList after removing the word")
             }
-            else if (event.target.id === "addToDic") {
-                logger.info(`the word ${event.target.dataset.word} is added to the dictionary`)
-                let wordToAdd = textAreaDetector.textAreaList[0].value[event.target.dataset.wordPlace]
-                let messageToAddToDic = {
-                    type: "addToDic",
-                    data: wordToAdd
-                }
-                chrome.runtime.sendMessage(messageToAddToDic, function (response) {
-                    logger.info(`response from the backgound script for reciving add to dictionary: ${response.result}`);
-                })
-            }
-
-
         });
     }
 

@@ -101,7 +101,10 @@ class SpellcheckCommunicationManager {
         // send text to the spellcheckAPIManager
         
     }
- 
+    // recieveCorrectedText() {
+    //     // recieve text from the spellcheckAPIManager
+    //     // TODO: implement this function
+    // }
     sendCorrectedText(resultData) {
         backgroundLogger.log("sending corrected text to content script");
         // send text to the content script
@@ -157,49 +160,6 @@ class SpellcheckCommunicationManager {
 const spellcheckCommunicationManager = new SpellcheckCommunicationManager();
 
 //----//-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
-//----//-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
-//dictionary class for user prefrence 
-class DictionaryManager{
-    dictionaryWords = new Set();
-    addTodic(text){
-        dictionaryWords.add(text);
-        this.savetoStorage();
-    }
-    removeFromDic(text){
-        this.dictionaryWords.delete(text);
-    }
-    getDic(){
-        return this.dictionaryWords;
-    }
-    clearDic(){
-        this.dictionaryWords.clear();
-    }
-    isInDic(text){
-        return this.dictionaryWords.has(text);
-    }
-    savetoStorage(){
-        chrome.storage.sync.set({ defaultDictionary: this.dictionaryWords }).then(() => {
-            backgroundLogger.log("data saved to storage");
-          });
-    }
-    loadfromStorage(){
-        chrome.storage.sync.get(["defaultDictionary"], (result) => {
-            backgroundLogger.log("dictionary loaded from storage");
-            this.dictionaryWords = result.defaultDictionary;
-          });
-    }
-}
-
-const dictionaryManager = new DictionaryManager();
-
-if (chrome.storage.get("defaultDictionary") != null){
-    dictionaryManager.loadfromStorage();
-}
-
-//save to storage when the tab curent tab  is about to close
-chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
-    dictionaryManager.savetoStorage();
-});  
 
 //-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 let contentLogger = "Logger from content script not received yet";
@@ -221,12 +181,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         });
 
         spellcheckCommunicationManager.sendTextforScanning(text);
+
+        
+        
     }
-    else if (request.type === "addToDic") {
-        backgroundLogger.log("word added to dictionary");
-        let word = request.data;
-        dictionaryManager.addTodic(word);
-    } 
 });
 
 console.log("background script loaded");
