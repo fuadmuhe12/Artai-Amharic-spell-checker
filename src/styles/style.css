@@ -702,3 +702,20 @@ video {
   --tw-text-opacity: 1;
   color: rgb(3 7 18 / var(--tw-text-opacity))
 }
+
+.hov_miss:hover{
+  background-color: rgba(73, 150, 164, 0.546);
+  color: black;
+}
+.hov_dic:hover{
+  background-color: rgba(27, 27, 199, 0.826);
+}
+.hov_more:hover{
+  background-color: rgba(13, 136, 89, 0.975);
+  color: rgb(215, 196, 196);
+  cursor: pointer;
+}
+ul.word_store {
+  max-height: 100px;
+  overflow-y: auto;
+}
