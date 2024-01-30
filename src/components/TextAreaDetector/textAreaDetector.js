@@ -500,9 +500,10 @@ class TextAreaDetector {
                 });
                 
 
-
-
-                div3.style = ` top: ${textAreaPos.top}px; left: ${textAreaPos.left}px; width: ${textAreaPos.width}px; height: ${textAreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
+                let scrollTop_ = window.pageYOffset || document.documentElement.scrollTop;
+                let scrollLeft_ = window.pageXOffset || document.documentElement.scrollLeft;
+                console.log(textAreaPos, "text area posotion from textAreaDetector class")
+                div3.style = ` top: ${textAreaPos.top+scrollTop_}px; left: ${textAreaPos.left+scrollLeft_}px; width: ${textAreaPos.width}px; height: ${textAreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
                 element2.appendChild(div3);
 
                 const element3 = shadowRoot.querySelector("#textarea")
@@ -795,8 +796,10 @@ class HighlighterManager {
 
             function change() {
                 text_AreaPos = text_Area.getBoundingClientRect();
+                let scrollTop__ = window.pageYOffset || document.documentElement.scrollTop;
+                let scrollLeft__ = window.pageXOffset || document.documentElement.scrollLeft;
                 console.log(text_AreaPos, "text area posotion from highlight function")
-                highlighterManager.element3.style = `top: ${text_AreaPos.top}px; left: ${text_AreaPos.left}px; width: ${text_AreaPos.width}px; height: ${text_AreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
+                highlighterManager.element3.style = `top: ${text_AreaPos.top+scrollTop__}px; left: ${text_AreaPos.left+scrollLeft__}px; width: ${text_AreaPos.width}px; height: ${text_AreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
 
                 highlighterManager.element4.innerHTML = ""
                 //up date the  posision of  logo icon
@@ -999,34 +1002,37 @@ class HighlighterManager {
     //===========================================================================================================================================================================================================
     //======//===========================================================================================================================================================================================================
     getTextNodeMetrics(element, words_need) {
-        console.log("posiitio checking started")
         const words = element.innerText.split(/(\s+)/);
         console.log(words, " inside position the list text inside text area")
         const metrics = []; // Initialize as an array
-        const divRect = element.getBoundingClientRect(); // Get the div's position
-        console.log(divRect, "the text are posiiton inside positio function")
+        let divRect = element.getBoundingClientRect(); // Get the div's position
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        let scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+        console.log(scrollLeft, "scrollLeft")
+        console.log(scrollTop, "scrollTop")
+        console.log(divRect, "divRect")
+        // divRect.top += scrollTop; // Add the scroll top
+        // divRect.left += scrollLeft; // Add the scroll left
+        console.log(divRect, "the text area position relative to the document")
         let id = 0;
         let word_ID = 0;
         words.forEach((word, index) => {
             if (words_need.has(word)) {
-
                 const range = document.createRange();
                 range.setStart(element.firstChild, words.slice(0, index).join('').length);
                 range.setEnd(element.firstChild, words.slice(0, index + 1).join('').length)
                 const rect = range.getBoundingClientRect();
-
-
                 metrics.push({
                     ID: id,
                     word_ID: word_ID,
                     word: word,
-                    top: rect.top - divRect.top, // Subtract the div's top
-                    left: rect.left - divRect.left, // Subtract the div's left
+                    top: rect.top - (divRect.top ), // Subtract the div's top
+                    left: rect.left - (divRect.left), // Subtract the div's left
                     width: rect.width,
                     height: rect.height
                 });
                 id += 1 // to keep track only misspelled words  
-
             }
             word_ID += 1 // keep track of each word in the text area 
         });
