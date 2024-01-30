@@ -916,7 +916,7 @@ class HighlighterManager {
             '<div class="flex ">' +
             '<span class="flex" id="add_to_dic">' +
             '<img src="https://i.ibb.co/Dkrtj44/add-to-dic.png" alt="add_to_dic" class="mr-2 size-10">' +
-            '<button class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold px-2 px- rounded hov_dic" id="replace">Add to Dictionary</button>' +
+            `<button class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold px-2 px- rounded hov_dic" data-wordplace = ${name.word_ID} id = "addToDic">Add to Dictionary</button>` +
             '</span>' +
             '</div>' +
             '<div class="mx-auto my-3 ">' +
