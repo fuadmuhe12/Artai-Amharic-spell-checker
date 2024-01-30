@@ -839,6 +839,11 @@ class HighlighterManager {
 
             // Start observing the textarea for size changes
             resizeObserver.observe(text_Area);
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 10 || window.scrollX > 10) {
+                    change()
+                }
+            });
 
             // Event listener for text input
             text_Area.addEventListener("input", change);
@@ -852,6 +857,8 @@ class HighlighterManager {
     // set of misspled words tobe highlighted
 
     create_misspelled_divs(name, suggestionList) {
+        //location of the text area from the current window
+        let textAreaPos_ = this.#textAreaList[0].getBoundingClientRect();
 
 
         logger.info(
@@ -895,7 +902,7 @@ class HighlighterManager {
 
         let suggestion_div = document.createElement("div");
         // show the suggestion in absolute position below the word, without any space separation between the two
-        suggestion_div.style = `position:absolute; top: ${name.top + name.height + 10}px; left: ${name.left - 10}px; `
+        suggestion_div.style = `position:fixed; top: ${name.top + name.height + 10 + textAreaPos_.top }px; left: ${name.left - 10 +textAreaPos_.left}px; `
         suggestion_div.style.display = "none";
         suggestion_div.style.zIndex = "99999";
         suggestion_div.dataset.suggestion = 'suggestion'
