@@ -868,12 +868,13 @@ class HighlighterManager {
         misspelled_hub.style.pointerEvents = "auto";
         misspelled_hub.style.zIndex = "1000";
         misspelled_hub.style = "width:100%; height:100%;"
-
+        misspelled_hub.dataset.missWordPlace = name.word_ID  
         misspelled_hub.id = `artai_misspelled_hub${name.ID}`
         if (
             shadowRoot.querySelector(`#artai_misspelled_hub${name.ID}`) === null
         ) {
             highlighterManager.element4.appendChild(misspelled_hub);
+            
         }
         let element5 = shadowRoot.querySelector(
             `#artai_misspelled_hub${name.ID}`
@@ -1105,6 +1106,7 @@ highlighterManager.subscribeEvent("MisspelledWord");
 // class for suggestion manager
 class SuggestionsManager {
     #suggestionList = [];
+    
 
     showSuggestions() {
         logger.info("suggesion manager is activated: now inside showSuggestions function");
@@ -1134,6 +1136,8 @@ class SuggestionsManager {
 
     }
     displaySuggesion(num) {
+        let diq_div = document.getElementById("diq");
+        const all_text = diq_div.innerText.split(/(\s+)/);
         logger.info("showsuggestin function is activated: inside showSuggestions function");
         const artai_suggestion = shadowRoot.getElementById(`artai_suggestion${num}`);
         artai_suggestion.style.display = 'block';
@@ -1151,6 +1155,22 @@ class SuggestionsManager {
                 console.log(suggestionsManager.#suggestionList, "index from suggestion#################################3   inside suggestion manager- ")
 
                 console.log(suggestionsManager.#suggestionList, "suggestionsManager.#suggestionList after removing the word")
+            }
+            else if (event.target.id === "addToDic") {
+               
+                let wordToAdd = all_text[Number(event.target.dataset.wordplace)]; 
+                let added_word = shadowRoot.querySelector(`[data-miss-word-place="${event.target.dataset.wordplace}"]`)
+                
+                console.log(added_word, "word to add to dic")
+                added_word.remove()
+                logger.info(`the word ${wordToAdd} is added to the dictionary`)
+                let messageToAddToDic = {
+                    type: "addToDic",
+                    data: wordToAdd
+                }
+                chrome.runtime.sendMessage(messageToAddToDic, function (response) {
+                    logger.info(`response from the backgound script for reciving add to dictionary: ${response.result}`);
+                })
             }
         });
     }

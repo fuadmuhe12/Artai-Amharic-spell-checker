@@ -7,7 +7,7 @@
     "default_popup": "./src/popup/pop.html"
   },
   "permissions": [
-    "activeTab"
+    "activeTab", "storage", "scripting", "tabs"
   ],
   "content_scripts": [
     {

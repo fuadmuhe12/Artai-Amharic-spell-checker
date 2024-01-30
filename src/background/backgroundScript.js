@@ -245,6 +245,7 @@ chrome.storage.local.get(['defaultDictionary'], function(result) {//dictionary
 });
 
 
+
 //-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 let contentLogger = "Logger from content script not received yet";
 // Listen for messages from the content script
