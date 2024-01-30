@@ -101,16 +101,29 @@ class SpellcheckCommunicationManager {
         // send text to the spellcheckAPIManager
         
     }
-    // recieveCorrectedText() {
-    //     // recieve text from the spellcheckAPIManager
-    //     // TODO: implement this function
-    // }
+
+
+    deleteDictWord(data){//dictionary
+        //make sure user dictionary is not included as misspelled word
+        let userDictionary = dictionaryManager.getDic();
+        let errors = data.result.errors;
+        let newErrors = [];
+        for (let i = 0; i < errors.length; i++) {
+            if (!userDictionary.has(errors[i].word)) {
+                newErrors.push(errors[i]);
+            }
+        }
+        data.result.errors = newErrors;
+        return data;
+    }
+ 
     sendCorrectedText(resultData) {
         backgroundLogger.log("sending corrected text to content script");
+        
         // send text to the content script
         let messageToContentScript = {
             type: "correctedText",
-            correctedText: resultData
+            correctedText: this.deleteDictWord(resultData)
         }; // demo data
         /* {
               result: 
@@ -160,6 +173,77 @@ class SpellcheckCommunicationManager {
 const spellcheckCommunicationManager = new SpellcheckCommunicationManager();
 
 //----//-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
+//----//-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
+//dictionary class for user prefrence 
+class DictionaryManager{ //dictionary
+    dictionaryWords = new Set();
+    addTodic(text){
+        this.dictionaryWords.add(text);
+        this.savetoStorage();
+        console.log(this.dictionaryWords, "dictionary words   ");
+        chrome.storage.local.get(['defaultDictionary'], (result) => {
+            if(result.defaultDictionary) {
+                console.log(result.defaultDictionary, "dictionary words from storage")
+            } else {
+                console.log("no dictionary found in storage   after adding  Fixxxxx");
+            }
+        });
+
+    }
+    removeFromDic(text){
+        this.dictionaryWords.delete(text);
+    }
+    getDic(){
+        return this.dictionaryWords;
+    }
+    clearDic(){
+        this.dictionaryWords.clear();
+    }
+    isInDic(text){
+        return this.dictionaryWords.has(text);
+    }
+    savetoStorage() {
+        let toSave = {
+            defaultDictionary: Array.from(this.dictionaryWords)
+        }
+        console.log(toSave, "to save")
+
+        chrome.storage.local.set(toSave)
+        .then(() => {
+            backgroundLogger.log("data saved to storage");
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
+    loadfromStorage() {
+        chrome.storage.local.get(['defaultDictionary'])
+        .then((result) => {
+            console.log(result, "result from storage")
+            if(result.defaultDictionary && Array.isArray(result.defaultDictionary)) {
+                backgroundLogger.log("dictionary loaded from storage");
+                this.dictionaryWords = new Set(result.defaultDictionary);
+            } else {
+                backgroundLogger.log("no dictionary found in storage");
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
+}
+const dictionaryManager = new DictionaryManager()
+
+// if there is saved dictionary load 
+chrome.storage.local.get(['defaultDictionary'], function(result) {//dictionary
+    if(result.defaultDictionary) {
+        dictionaryManager.loadfromStorage();
+        backgroundLogger.log("dictionary loaded from storage");
+    } else {
+        backgroundLogger.log("no dictionary found in storage");
+    }
+});
+
 
 //-------------------------------------------------------------------------------------//-----------------------------------------------------------------------------------------------------
 let contentLogger = "Logger from content script not received yet";
@@ -181,10 +265,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         });
 
         spellcheckCommunicationManager.sendTextforScanning(text);
-
-        
-        
     }
+    else if (request.type === "addToDic") {//dictionary
+        backgroundLogger.log("word added to dictionary");
+        console.log(`word added to dictionary: ${request.data}`);
+        let word = request.data;
+        dictionaryManager.addTodic(word);
+        sendResponse({
+            result: `succesfully added word ${word} to dictionary: from background script `,
+        });
+    } 
 });
 
 console.log("background script loaded");
