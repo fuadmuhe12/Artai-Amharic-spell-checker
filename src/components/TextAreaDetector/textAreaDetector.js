@@ -488,7 +488,6 @@ class TextAreaDetector {
                     //add the hover effect and scale up
                     logo.style.transform = "scale(1.2)";
                     logo.style.transition = "transform 0.5s";
-                    logo.style.backgroundColor = "rgb(31, 198, 101)";
 
                 });
 
