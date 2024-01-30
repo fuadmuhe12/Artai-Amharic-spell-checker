@@ -65,12 +65,13 @@ const div = document.createElement("div");
 div.setAttribute("id", "artai_main");
 // shadow.appendChild(div);
 
-document.lastChild.appendChild(div);
+document.documentElement.appendChild(div);
 const element = document.getElementById("artai_main");
 
 const shadow = element.attachShadow({ mode: "open" });
 
 const shadowRoot = element.shadowRoot;
+
 //==========================================================================================================================================================================================================
 // add the css file to the shadow root
 logger.info("adding a css file to the shadow root")
@@ -78,6 +79,8 @@ let linkElem = document.createElement('link');
 linkElem.setAttribute('rel', 'stylesheet');
 linkElem.setAttribute('href', 'Spell-Checking-Extension/src/styles/style.css');
 shadowRoot.appendChild(linkElem);
+
+
 //====================================//==========================================================================================================================================================================================================
 //adding a tailwind link to the shadow root
 //=======================================================================================================================================================================
@@ -91,6 +94,7 @@ div2.style =
     "position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; ";
 shadow.appendChild(div2);
 const element2 = shadowRoot.querySelector("#artai_full");
+
 
 //==========================================================================================================================================================================================================
 
@@ -164,14 +168,16 @@ class EventDispatcher {
     publishEvent(channelName, event) {
         let channelFound = false;
         logger.info(`data is being published to channel ${channelName}`);
-
+        
         for (let element of this.channels) {
+            
             if (element.channelName === channelName) {
                 channelFound = true;
                 element.subscribers.forEach(function (subscriber) {
                     logger.info(
                         `Event is published to be handled by the channel ${channelName} `
                     );
+                    
                     subscriber.handleEvent(event);
                     // the handleEvent function should be implemented in the subscriber class
                 });
@@ -254,7 +260,7 @@ class UserInterfaceManager {
 
 
                 console.log(div, "div");
-                parent.appendChild(div);
+
                 console.log(parent, "parent");
 
                 break;
@@ -476,6 +482,7 @@ class TextAreaDetector {
                 logo.setAttribute("title", "Artie Amharic Spellcheck");
                 logo.setAttribute("style", `width: 20px; height: 20px; margin-left: 5px; cursor: pointer; position: absolute; top: ${textAreaPos.top + textAreaPos.height - 30}px; left: ${textAreaPos.left + textAreaPos.width - 33}px; `);
                 shadowRoot.appendChild(logo);
+                
 
                 logo.addEventListener("mouseover", function () {
                     //add the hover effect and scale up
@@ -491,6 +498,7 @@ class TextAreaDetector {
 
                     logo.style.backgroundColor = "";
                 });
+                
 
 
 
@@ -504,15 +512,18 @@ class TextAreaDetector {
                 console.log(divs)
                 element3.appendChild(divs)
                 const element4 = shadowRoot.querySelector("#artai_misspelles_words_store")
-
+                
                 //===============================================================================================================================================================================================
                 console.log(`Found ${this.textAreaList.length} text areas in the page`);
                 console.log(this.textAreaList, "from textAreaDetector class");
+                
                 EventDispatcherObj.publishEvent("TextArea", {
                     type: "textArea",
                     DOM: this.textAreaList,
                     GeezScript: null,
                 });
+                
+                
                 console.log(EventDispatcherObj, "from textAreaDetector class");
             } else {
                 logger.info("No text areas in the page");
