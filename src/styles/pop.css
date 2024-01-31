@@ -599,6 +599,12 @@ video {
   justify-content: space-between
 }
 
+.space-y-4 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse))
+}
+
 .rounded-lg{
   border-radius: 0.5rem
 }
@@ -639,6 +645,29 @@ video {
   --tw-bg-opacity: 0.5
 }
 
+.bg-gradient-to-r{
+  background-image: linear-gradient(to right, var(--tw-gradient-stops))
+}
+
+.from-blue-500{
+  --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(59 130 246 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)
+}
+
+.via-teal-600{
+  --tw-gradient-to: rgb(13 148 136 / 0)  var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #0d9488 var(--tw-gradient-via-position), var(--tw-gradient-to)
+}
+
+.to-blue-700{
+  --tw-gradient-to: #1d4ed8 var(--tw-gradient-to-position)
+}
+
+.p-4{
+  padding: 1rem
+}
+
 .p-6{
   padding: 1.5rem
 }
@@ -672,6 +701,11 @@ video {
   font-weight: 600
 }
 
+.text-gray-800{
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity))
+}
+
 .text-red-500{
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity))
@@ -688,15 +722,37 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
 }
 
+.transition-all{
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms
+}
+
+.duration-300{
+  transition-duration: 300ms
+}
+
 .hover\:bg-blue-600:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(37 99 235 / var(--tw-bg-opacity))
+}
+
+.hover\:bg-gray-200:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity))
 }
 
 .hover\:text-red-700:hover{
   --tw-text-opacity: 1;
   color: rgb(185 28 28 / var(--tw-text-opacity))
 }
+.space-y-2 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse))
+}
+
+
 
 .store_dic{
     max-height: 100px;
@@ -704,5 +760,26 @@ video {
 }
 #pop-body li{
     padding-right: 10px;
+
+}
+.word_font{
+    font-size: 15px;
+    font-weight:bolder;
+}
+/* even childs only */
+.store_dic li{
+  border-radius: 5px;
+  padding: 10px;
+}
+.store_dic li:nth-child(even) {
+    background-color: #ccc9c9;
+ 
+}
+
+/* odd childs only */
+.store_dic li:nth-child(odd) {
+    
+    background-color: #b0d5ff;
+ 
 
 }

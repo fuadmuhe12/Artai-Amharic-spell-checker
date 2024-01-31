@@ -2,7 +2,7 @@
 function addDictionary(toAdd) {
     console.log(toAdd, "to add");
     let li = document.createElement("li");
-    li.className = "flex justify-between items-center border-b border-gray-300 py-2";
+    li.className = "flex justify-between items-center word_font border-b border-gray-300 py-2";
     li.innerHTML = `<span>${toAdd}</span>` + `<div>` + `<button class="text-red-500 hover:text-red-700"  id="del_dic">Delete</button>` + `</div>`;
     // Assuming you have a parent element to append this list item to
     document.getElementById('dict_store').appendChild(li);
@@ -14,7 +14,7 @@ chrome.storage.local.get(['defaultDictionary'], function (result) { //dictionary
         document.getElementById('dict_store').innerHTML = "";
         result.defaultDictionary.forEach(function (item) {
             let li = document.createElement("li");
-            li.className = "flex justify-between items-center border-b border-gray-300 py-2";
+            li.className = "flex justify-between items-center word_font border-b border-gray-300 py-2";
             li.innerHTML = `<span>${item}</span>` + `<div>` + `<button class="text-red-500 hover:text-red-700"  id="del_dic">Delete</button>` + `</div>`;
             // Assuming you have a parent element to append this list item to
             document.getElementById('dict_store').appendChild(li);
