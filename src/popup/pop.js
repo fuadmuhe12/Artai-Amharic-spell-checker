@@ -21,6 +21,10 @@ chrome.storage.local.get(['defaultDictionary'], function (result) { //dictionary
         });
     } else {
         console.log("no dictionary found in storage"); // Replaced backgroundLogger.log with console.log
+        let li = document.createElement("li");
+        li.className = "text-gray-500 text-sm";
+        li.innerHTML = "No words added yet.";
+        document.getElementById('dict_store').appendChild(li);
     }
 });
 
