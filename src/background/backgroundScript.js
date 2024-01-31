@@ -180,18 +180,12 @@ class DictionaryManager{ //dictionary
     addTodic(text){
         this.dictionaryWords.add(text);
         this.savetoStorage();
-        console.log(this.dictionaryWords, "dictionary words   ");
-        chrome.storage.local.get(['defaultDictionary'], (result) => {
-            if(result.defaultDictionary) {
-                console.log(result.defaultDictionary, "dictionary words from storage")
-            } else {
-                console.log("no dictionary found in storage   after adding  Fixxxxx");
-            }
-        });
-
+        console.log(this.dictionaryWords, "dictionary words added   ");
     }
     removeFromDic(text){
+        
         this.dictionaryWords.delete(text);
+        this.savetoStorage();
     }
     getDic(){
         return this.dictionaryWords;
@@ -276,6 +270,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             result: `succesfully added word ${word} to dictionary: from background script `,
         });
     } 
+    else if (request.type === "del_dict") {
+        backgroundLogger.log("word deleted from dictionary");
+        console.log(`word deleted from dictionary: ${request.value}`);
+        let word = request.value;
+        dictionaryManager.removeFromDic(word);
+        sendResponse({
+            result: `succesfully deleted word ${word} from dictionary: from background script `,
+        });
+    }
 });
 
 console.log("background script loaded");

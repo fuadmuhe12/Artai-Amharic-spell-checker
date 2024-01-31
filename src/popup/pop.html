@@ -4,19 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <link rel="stylesheet" href="../styles/pop.css">
+
 </head>
-<body>
+<body class="pop_" style="min-height: 350px; min-width: 300px;">
     <!-- pop window for the extension  -->
-    <div id="pop">
-        <div id="pop-content">
-            <div id="pop-header">
-                <h1>Extension</h1>
-                <button id="close">X</button>
+    <div id="pop" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div id="pop-content" class="bg-white w-96 rounded-lg shadow-md p-6">
+            <div id="pop-header" class="flex items-center mb-4">
+                <img src="https://i.ibb.co/41NdWcZ/Artai-logo-png-modified-128.png" alt="Artai Logo" class="w-8 h-8 mr-2">
+                <h2 class="text-lg font-semibold">Artai Amharic Spell Checker</h2>
             </div>
             <div id="pop-body">
-                <p>Extension is working</p>
+                <!-- Your content here -->
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2">Dictionary Manager</h3>
+                    <ul class="store_dic" id="dict_store">
+                        <li class="flex justify-between items-center border-b border-gray-300 py-2">
+                            <span>Word 1</span>
+                            <div>
+                                <button class="text-red-500 hover:text-red-700" id="del_dic">Delete</button>
+                            </div>
+                        </li>
+                        
+                        <!-- Add more words as needed -->
+                    </ul>
+                </div>
+                <div class="mt-4  ">
+                    <label for="new_dic"></label>
+                    <input type="text" class="border border-gray-300 px-3 py-2 w-full rounded-md" placeholder="New word" id="new_dict">
+                    <button class="bg-blue-500 text-white py-2  px-4 mt-3 rounded-md ml-2 hover:bg-blue-600 px-6 " id="add_dic">Add</button>
+                </div>
             </div>
         </div>
-    <script src="../components/TextAreaDetector/textAreaDetector.js"></script>
+    </div>
+    
+    
+    <script src="./pop.js"></script>
 </body>
 </html>

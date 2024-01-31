@@ -59,7 +59,7 @@ class Logger {
 
 const logger = new Logger();
 window.logger = logger;
-console.log(logger);
+//console.log(logger);
 //-------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------
 const div = document.createElement("div");
 div.setAttribute("id", "artai_main");
@@ -84,7 +84,7 @@ shadowRoot.appendChild(style);
 //====================================//==========================================================================================================================================================================================================
 //adding a tailwind link to the shadow root
 //=======================================================================================================================================================================
-console.log(shadowRoot, "shadowRoot");
+//console.log(shadowRoot, "shadowRoot");
 logger.info("shadow root is created");
 let div2 = document.createElement("div");
 
@@ -138,7 +138,7 @@ listChannels.add(channel_2_Geez);
 listChannels.add(channel_3_Misspelled);
 listChannels.add(channel_4_Suggestion);
 listChannels.add(channel_5_Interact);
-console.log(listChannels);
+//console.log(listChannels);
 // ------------------------------------------------//----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -239,13 +239,13 @@ class UserInterfaceManager {
         this.eventDispatcher.publishEvent(channelName, payload);
     }
     handleEvent(event) {
-        console.log("userinterafce manager , handle event started");
+        //console.log("userinterafce manager , handle event started");
         //{ "DOM": this.textAreaList, "GeezScript": null }
         //{ type:"textArea", DOM: this.textAreaList, GeezScript: null }
-        console.log("event is started");
+        //console.log("event is started");
         switch (event.type) {
             case "textArea":
-                console.log("text area event is started");
+                //console.log("text area event is started");
                 logger.info("text area is detected and spellcheck is activated");
                 this.#textAreaList = event.DOM;
                 const textArea1 = this.#textAreaList[0];
@@ -259,16 +259,16 @@ class UserInterfaceManager {
 
 
 
-                console.log(div, "div");
+                //console.log(div, "div");
 
-                console.log(parent, "parent");
+                //console.log(parent, "parent");
 
                 break;
             case "GeezScript":
                 logger.info( `UIM recieded GeezScript , ready to send the text to the server for scanning : UMI line 262`);
                 // I want the data  to be sent only if  the sentdata is false
 
-                console.log("sending the geez @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",this.#textAreaList[0].value) 
+                //console.log("sending the geez @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",this.#textAreaList[0].value) 
 
                 // if GeezScript is detected, activate the spellcheck to send the text to the server
                 this.#GeezScript = event.DOM;
@@ -311,7 +311,7 @@ class UserInterfaceManager {
 
     recieveMessageFromCommunicationManager(result) {
         logger.info("publishing recieved data from background script: UIM/recieveMessageFromCommunicationManager line 307  ");
-        console.log(result, "result from UIM class line: 308")
+        //console.log(result, "result from UIM class line: 308")
         let sentText = result.text;
         let receivedErrors = result.errors;
         this.#misspelledWordList.clear();
@@ -509,13 +509,13 @@ class TextAreaDetector {
                 var divs = document.createElement("div");
                 divs.style = "position: absolute; top: 0px; left: 0px; height: 700px; width: 1500px; "
                 divs.setAttribute("id", "artai_misspelles_words_store")
-                console.log(divs)
+                //console.log(divs)
                 element3.appendChild(divs)
                 const element4 = shadowRoot.querySelector("#artai_misspelles_words_store")
                 
                 //===============================================================================================================================================================================================
-                console.log(`Found ${this.textAreaList.length} text areas in the page`);
-                console.log(this.textAreaList, "from textAreaDetector class");
+                //console.log(`Found ${this.textAreaList.length} text areas in the page`);
+                //console.log(this.textAreaList, "from textAreaDetector class");
                 
                 EventDispatcherObj.publishEvent("TextArea", {
                     type: "textArea",
@@ -524,7 +524,7 @@ class TextAreaDetector {
                 });
                 
                 
-                console.log(EventDispatcherObj, "from textAreaDetector class");
+                //console.log(EventDispatcherObj, "from textAreaDetector class");
             } else {
                 logger.info("No text areas in the page");
             }
@@ -768,7 +768,7 @@ class HighlighterManager {
             }
 
             // place where the div of misspelled words will be stored
-            // console.log('This is fine')
+            // //console.log('This is fine')
             this.element4 = shadowRoot.querySelector(
                 "#artai_misspelles_words_store"
             );
@@ -797,7 +797,7 @@ class HighlighterManager {
                 text_AreaPos = text_Area.getBoundingClientRect();
                 let scrollTop__ = window.pageYOffset || document.documentElement.scrollTop;
                 let scrollLeft__ = window.pageXOffset || document.documentElement.scrollLeft;
-                console.log(text_AreaPos, "text area posotion from highlight function")
+                //console.log(text_AreaPos, "text area posotion from highlight function")
                 highlighterManager.element3.style = `top: ${text_AreaPos.top+scrollTop__}px; left: ${text_AreaPos.left+scrollLeft__}px; width: ${text_AreaPos.width}px; height: ${text_AreaPos.height}px;box-sizing: content-box;  position: relative; pointer-events: none; overflow: hidden; border: 0px; border-radius: 0px; padding: 0px; margin: 0px;`;
 
                 highlighterManager.element4.innerHTML = ""
@@ -807,10 +807,10 @@ class HighlighterManager {
 
 
 
-                console.log(getCaretCoordinates(text_Area, text_Area.selectionStart).div, "the mirro sfvsfdvsfdv r")
+                //console.log(getCaretCoordinates(text_Area, text_Area.selectionStart).div, "the mirro sfvsfdvsfdv r")
                 text_Area = highlighterManager.#textAreaList[0];
                 let mirror = getCaretCoordinates(text_Area, text_Area.selectionStart).div
-                console.log(mirror, "the mirror")
+                //console.log(mirror, "the mirror")
                 if (diq.textContent !== mirror.textContent) {
                     diq.textContent = mirror.textContent;
                 }
@@ -820,9 +820,9 @@ class HighlighterManager {
                     diq.style[property] = mirror.style[property];
                 }
 
-                console.log(diq, "the diq")
+                //console.log(diq, "the diq")
                 const vals = highlighterManager.getTextNodeMetrics(diq, misspelled_words)// get the position of each word in the text area
-                console.log(vals, "vals")
+                //console.log(vals, "vals")
                 for (let word = 0; word < vals.length; word++) {
 
                     highlighterManager.create_misspelled_divs(vals[word], highlighterManager.#suggestedList[word]) // create the divs for each misspelled word to be hightlited and also their suggestion
@@ -929,7 +929,7 @@ class HighlighterManager {
         let ul = suggestion_div.querySelector('.text-center');
         if (highlighterManager.#suggestedList.length > 0) {
             let num = 0;
-            console.log(highlighterManager.#suggestedList, "highlighterManager.#suggestedList")
+            //console.log(highlighterManager.#suggestedList, "highlighterManager.#suggestedList")
 
             if (highlighterManager.#suggestedList[name.ID].length > 0) {
                 highlighterManager.#suggestedList[name.ID].forEach((suggestion) => {
@@ -1010,7 +1010,7 @@ class HighlighterManager {
     //======//===========================================================================================================================================================================================================
     getTextNodeMetrics(element, words_need) {
         const words = element.innerText.split(/(\s+)/);
-        console.log(words, " inside position the list text inside text area")
+        //console.log(words, " inside position the list text inside text area")
         const metrics = []; // Initialize as an array
         let divRect = element.getBoundingClientRect(); // Get the div's position
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -1050,9 +1050,9 @@ class HighlighterManager {
         // delete the wordlist from the set
         logger.info(`removing the word ${word} and suggestion  from the misspelled word list: inside removehighlight function line:1003`)
         logger.info(`suggestedList before removing ${this.#suggestedList} : inside removehighlight function line:1004`)
-        console.log(this.#suggestedList, `suggestion before removing --------------------------- inside hightligt`)
+        //console.log(this.#suggestedList, `suggestion before removing --------------------------- inside hightligt`)
         this.#suggestedList.splice(index, 1) // remove the suggestion from the list
-        console.log(this.#suggestedList, "after removing the suggestion-------------------------------- inside highlight")
+        //console.log(this.#suggestedList, "after removing the suggestion-------------------------------- inside highlight")
         logger.info(`suggestedList after removing ${this.#suggestedList} : inside removehighlight function line:1006`)
 
         this.#misspelledWordList.delete(word);
@@ -1060,7 +1060,7 @@ class HighlighterManager {
         words[place] = word;
         this.#textAreaList[0].value = words.join('');
         // remove the divs from the shadow root
-        console.log(index, "index from suggestion---------------------------------- ")
+        //console.log(index, "index from suggestion---------------------------------- ")
 
         this.highlight();
     }
@@ -1075,15 +1075,15 @@ class HighlighterManager {
          }
          */
         logger.info(`highlighter manager is handling the event ${event.type} `);
-        console.log(event, "event from highlighter manager");
+        //console.log(event, "event from highlighter manager");
         switch (event.type) {
             case "MisspelledWord and suggestion":
                 logger.info("Misspelled word is received from the server and highlight is activated: from highlighterManager event handler");
                 this.#textAreaList = event.DOM;
                 this.#misspelledWordList = event.misspelledData;
                 this.#suggestedList = event.suggestionData;
-                console.log(this.#misspelledWordList, "this.#misspelledWordList from highlighter manager")
-                console.log(this.#suggestedList, "this.#suggestedList from highlighter manager")
+                //console.log(this.#misspelledWordList, "this.#misspelledWordList from highlighter manager")
+                //console.log(this.#suggestedList, "this.#suggestedList from highlighter manager")
                 this.highlight();
                 break;
             case "SuggestionSelected":
@@ -1115,12 +1115,12 @@ class SuggestionsManager {
 
         //     // Get all elements with class 'misspleledWord'
         //     const misspelledWordsForsuggesion = shadowRoot.querySelectorAll('[data-misspelled="misspelled"]');;
-        //     console.log(misspelledWordsForsuggesion, "misspelledWordsForsuggesion from suggestion manager")
+        //     //console.log(misspelledWordsForsuggesion, "misspelledWordsForsuggesion from suggestion manager")
         //     // Add event listeners to each 'misspleledWord' element
         //     for (let index = 0; index < misspelledWordsForsuggesion.length; index++) {
         //         shadowRoot.getElementById(`#artai_misspelled_word${index}`).addEventListener('mouseover', function () {
         //             suggestionsManager.displaySuggesion(index);
-        //             console.log(misspleledWord,index, "index")
+        //             //console.log(misspleledWord,index, "index")
         //             //  add event to the parent of the event 
 
         //         });
@@ -1148,21 +1148,21 @@ class SuggestionsManager {
                 let place = Number(event.target.dataset.wordPlace)
                 let index = Number(event.target.dataset.suggestionPlace)
                 let word = event.target.textContent
-                console.log(suggestionsManager.#suggestionList, "before removing suggestion ################### inside suggestion manger")
+                //console.log(suggestionsManager.#suggestionList, "before removing suggestion ################### inside suggestion manger")
                 //suggestionsManager.#suggestionList.splice(index,1)
 
                 highlighterManager.removehighlight(word, place, index)
-                console.log(suggestionsManager.#suggestionList, "index from suggestion#################################3   inside suggestion manager- ")
+                //console.log(suggestionsManager.#suggestionList, "index from suggestion#################################3   inside suggestion manager- ")
 
-                console.log(suggestionsManager.#suggestionList, "suggestionsManager.#suggestionList after removing the word")
+                //console.log(suggestionsManager.#suggestionList, "suggestionsManager.#suggestionList after removing the word")
             }
             else if (event.target.id === "addToDic") {
                
                 let wordToAdd = all_text[Number(event.target.dataset.wordplace)]; 
                 let added_word = shadowRoot.querySelector(`[data-miss-word-place="${event.target.dataset.wordplace}"]`)
                 
-                console.log(added_word, "word to add to dic")
-                added_word.remove()
+                //console.log(added_word, "word to add to dic")
+                added_word.remove()  
                 logger.info(`the word ${wordToAdd} is added to the dictionary`)
                 let messageToAddToDic = {
                     type: "addToDic",
@@ -1211,7 +1211,7 @@ setInterval(function () {
     chrome.runtime.sendMessage(
         { type: "sendLogger", logger: logger.getLogMessages() },
         function (response) {
-            console.log(response.result);
+            //console.log(response.result);
         }
     );
     // Clear the log messages
@@ -1220,10 +1220,11 @@ setInterval(function () {
 
 // --------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-console.log(EventDispatcherObj.channels, "channels--------------------------------------------------");
-console.log(EventDispatcherObj.getChannelSubscribers("Suggesion"), "sugetion channel subscribers--------------------------------------------------");
-console.log(EventDispatcherObj.getChannelSubscribers("MisspelledWord"), "MisspelledWord channel subscribers----------------------------------------");
+//console.log(EventDispatcherObj.channels, "channels--------------------------------------------------");
+//console.log(EventDispatcherObj.getChannelSubscribers("Suggesion"), "sugetion channel subscribers--------------------------------------------------");
+//console.log(EventDispatcherObj.getChannelSubscribers("MisspelledWord"), "MisspelledWord channel subscribers----------------------------------------");
 
 
 
-
+let add_to_dic = document.getElementById("new_dict");
+console.log(add_to_dic, "add_to_dic")
