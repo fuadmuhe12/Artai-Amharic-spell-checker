@@ -1,11 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "Spell Checker Extension",
+  "name": "Artai Amharic spell Checker",
   "version": "1.0.0",
-  "description": "Provides spell-checking functionality within web pages",
+  "description": "Provides Amharic spell-checking functionality for web pages",
+  
   "action": {
     "default_popup": "./src/popup/pop.html"
   },
+  "icons":{
+    "128" : "./src/Icons/Artai-logo.png-modified-128.png", 
+    "16": "./src/Icons/Artai-logo.png-modified-16.png",
+    "32": "./src/Icons/Artai-logo.png-modified-32.png"
+  },
+  
   "permissions": [
     "activeTab", "storage", "scripting", "tabs"
   ],
