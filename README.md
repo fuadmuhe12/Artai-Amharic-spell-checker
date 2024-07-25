@@ -1,6 +1,3 @@
-Here's a structured and detailed README for your GitHub project, including placeholders for your video and images:
-
----
 
 # 🌟 Artai Amharic Spell Checker 🌟
 
@@ -74,6 +71,3 @@ This project is licensed under the MIT License. See the [LICENSE](link_to_licens
 
 If you have any questions, feel free to reach out to us at [your_email@example.com](mailto:your_email@example.com).
 
----
-
-Feel free to replace the placeholders with the actual paths to your images, video, documentation, contributing guidelines, code of conduct, and license file.
