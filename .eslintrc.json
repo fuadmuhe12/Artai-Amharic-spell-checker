@@ -1,0 +1,52 @@
+{
+    "extends": "eslint:recommended",
+    "rules": {
+      // Possible Errors
+      "no-console": "off",               // Allow console.log statements
+      "no-debugger": "error",
+      "no-extra-semi": "error",
+      "no-irregular-whitespace": "error",
+      "no-template-curly-in-string": "error",
+      "no-unexpected-multiline": "error",
+      
+      // Best Practices (critical)
+      "curly": "error",
+      "eqeqeq": ["error", "always"],
+      "no-alert": "error",
+      "no-empty-function": "error",
+      "no-eval": "error",
+      "no-extend-native": "error",
+      "no-implied-eval": "error",
+      "no-invalid-this": "error",
+      "no-loop-func": "error",
+      "no-multi-spaces": "error",
+      "no-new-func": "error",
+      "no-return-assign": ["error", "always"],
+      "no-self-compare": "error",
+      "no-useless-return": "error",
+      "no-with": "error",
+      
+      // Variables
+      "no-undef": "error",
+      "no-unused-vars": ["error", { "vars": "all", "args": "none", "ignoreRestSiblings": false }],
+      "no-use-before-define": ["error", { "functions": false, "classes": true, "variables": true }],
+      
+      // ES6
+      "constructor-super": "error",
+      "no-class-assign": "error",
+      "no-const-assign": "error",
+      "no-dupe-class-members": "error",
+      "no-new-symbol": "error",
+      "no-this-before-super": "error"
+    },
+    "env": {
+      "browser": true,
+      "node": true,
+      "es6": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2020,
+      "sourceType": "module"
+    }
+  }
+  
