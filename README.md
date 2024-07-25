@@ -20,7 +20,7 @@ Behind the scenes, our spell checker harnesses state-of-the-art technology, incl
 ## 📸 Screenshots
 
 ### Misspelled words are underlined in red
-![Misspelled Words](path_to_image_1)
+![Misspelled Words](https://github.com/fuadmuhe12/Amharic-spell-checker/tree/updated/public/screen%20shoots)
 
 ### Hovering over underlined words shows suggestions
 ![Suggestions](path_to_image_2)
