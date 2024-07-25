@@ -31,7 +31,7 @@ Behind the scenes, our spell checker harnesses state-of-the-art technology, incl
 
 Check out our demo video to see the Artai Amharic Spell Checker in action:
 
-[![Watch the video](https://github.com/fuadmuhe12/Amharic-spell-checker/blob/updated/public/screen%20shoots/thumbnail.jpg)](https://github.com/fuadmuhe12/Amharic-spell-checker/blob/updated/public/screen%20shoots/video.mp4) <!-- Make the thumbnail image clickable to play the video -->
+[![Watch the video](https://github.com/fuadmuhe12/Amharic-spell-checker/blob/updated/public/screen%20shoots/thumbnail.jpg)](https://www.linkedin.com/posts/fuadmuhe_artaispellchecker-amharicwriting-innovation-activity-7162504498425360384-sXTS?utm_source=share&utm_medium=member_desktop) <!-- Make the thumbnail image clickable to play the video -->
 
 
 
